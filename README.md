@@ -1,5 +1,5 @@
-# aws-modules-template
-Template for aws modules
+# aws-modules-rds
+Terraform module for AWS RDS instances
 
 # Documentation
 <!-- BEGIN_TF_DOCS -->
