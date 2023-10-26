@@ -1,10 +1,3 @@
-# Expose vars for DB instance. Override defaults with sensible values for DFDS context
-
-
-################################################################################
-# Instance specific variables - applicable to cluster instances as well
-################################################################################
-
 variable "identifier" {
   description = "The name of the RDS instance"
   type        = string
@@ -31,8 +24,7 @@ variable "allocated_storage" {
 variable "storage_type" {
   description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), or 'io1' (provisioned IOPS SSD). The default is 'io1' if iops is specified, 'gp2' if not. If you specify 'io1' or 'gp3' , you must also include a value for the 'iops' parameter"
   type        = string
-  # default     = null
-  default = "gp2"
+  default     = null
 }
 
 variable "storage_throughput" {
@@ -92,22 +84,19 @@ variable "domain_iam_role_name" {
 variable "engine" {
   description = "The database engine to use"
   type        = string
-#   default     = null
-  default = "postgres"
+  default     = null
 }
 
 variable "engine_version" {
   description = "The engine version to use"
   type        = string
-#   default     = null
-  default = "14"
+  default     = null
 }
 
 variable "skip_final_snapshot" {
   description = "Determines whether a final DB snapshot is created before the DB instance is deleted. If true is specified, no DBSnapshot is created. If false is specified, a DB snapshot is created before the DB instance is deleted"
   type        = bool
-#   default     = false
-  default     = true # Snapshots are already created by the AWS backup job.
+  default     = false
 }
 
 variable "snapshot_identifier" {
@@ -174,8 +163,7 @@ variable "master_user_secret_kms_key_id" {
 variable "port" {
   description = "The port on which the DB accepts connections"
   type        = string
-  # default     = null
-  default = "5432"
+  default     = null
 }
 
 variable "vpc_security_group_ids" {
@@ -223,8 +211,7 @@ variable "monitoring_role_arn" {
 variable "monitoring_role_name" {
   description = "Name of the IAM role which will be created when create_monitoring_role is enabled"
   type        = string
-  # default     = "rds-monitoring-role"
-  default = null
+  default     = "rds-monitoring-role"
 }
 
 variable "monitoring_role_use_name_prefix" {
@@ -239,6 +226,12 @@ variable "monitoring_role_description" {
   default     = null
 }
 
+variable "monitoring_iam_role_path" {
+  description = "Path for the monitoring role"
+  type        = string
+  default     = null
+}
+
 variable "create_monitoring_role" {
   description = "Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs"
   type        = bool
@@ -247,12 +240,6 @@ variable "create_monitoring_role" {
 
 variable "monitoring_role_permissions_boundary" {
   description = "ARN of the policy that is used to set the permissions boundary for the monitoring IAM role"
-  type        = string
-  default     = null
-}
-
-variable "monitoring_iam_role_path" {
-  description = "Path for the monitoring role"
   type        = string
   default     = null
 }
@@ -278,11 +265,8 @@ variable "apply_immediately" {
 variable "maintenance_window" {
   description = "The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00'"
   type        = string
-#   default     = null
-  default     = "Sat:21:00-Sun:01:00" # This is adjusted in accordance with AWS Backup schedule, see info here: https://wiki.dfds.cloud/en/playbooks/aws-backup/aws-backup-getting-started
+  default     = null
 }
-# Continuous backup takes place between 1 and 5 AM UTC.
-# Snapshot backups take place between 3 and 7 AM UTC.
 
 variable "blue_green_update" {
   description = "Enables low-downtime updates using RDS Blue/Green deployments."
@@ -349,13 +333,12 @@ variable "create_db_subnet_group" {
   description = "Whether to create a database subnet group"
   type        = bool
   default     = false
-
 }
 
 variable "db_subnet_group_name" {
   description = "Name of DB subnet group. DB instance will be created in the VPC associated with the DB subnet group. If unspecified, will be created in the default VPC"
   type        = string
-#   default     = null # required # it can be null
+  default     = null
 }
 
 variable "db_subnet_group_use_name_prefix" {
@@ -377,7 +360,7 @@ variable "subnet_ids" {
 }
 
 # DB parameter group
-variable "create_db_parameter_group" { # Test this
+variable "create_db_parameter_group" {
   description = "Whether to create a database parameter group"
   type        = bool
   default     = true
@@ -404,7 +387,7 @@ variable "parameter_group_description" {
 variable "family" {
   description = "The family of the DB parameter group"
   type        = string
-  default     = null # varies depending on engine and version and instance type
+  default     = null
 }
 
 variable "parameters" {
@@ -441,9 +424,7 @@ variable "option_group_description" {
 variable "major_engine_version" {
   description = "Specifies the major version of the engine that this option group should be associated with"
   type        = string
-  # default     = null
-  default = "14"
-  # All available versions: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html#PostgreSQL.Concepts
+  default     = null
 }
 
 variable "options" {
@@ -527,7 +508,7 @@ variable "max_allocated_storage" {
 variable "ca_cert_identifier" {
   description = "Specifies the identifier of the CA certificate for the DB instance"
   type        = string
-  default     = null # Need to be specified?
+  default     = null
 }
 
 variable "delete_automated_backups" {
@@ -546,7 +527,7 @@ variable "network_type" {
 # CloudWatch Log Group
 ################################################################################
 
-variable "create_cloudwatch_log_group" { ## TODO: Do we need this?
+variable "create_cloudwatch_log_group" {
   description = "Determines whether a CloudWatch log group is created for each `enabled_cloudwatch_logs_exports`"
   type        = bool
   default     = false
@@ -564,271 +545,8 @@ variable "cloudwatch_log_group_kms_key_id" {
   default     = null
 }
 
-
-
-
-################################################################################
-# Cluster specific variables
-################################################################################
-
-variable "is_db_cluster" {
+variable "cloudwatch_log_group_skip_destroy_on_deletion" {
+  description = "value to skip destroy ClouwWatch log group on deletion"
   type = bool
   default = false
-}
-
-variable "cluster_is_primary_cluster" {
-  description = "Determines whether cluster is primary cluster with writer instance (set to `false` for global cluster and replica clusters)"
-  type        = bool
-  default     = true
-}
-
-variable "cluster_use_name_prefix" {
-  description = "Whether to use `name` as a prefix for the cluster"
-  type        = bool
-  default     = false
-}
-
-variable "cluster_availability_zones" {
-  description = "List of EC2 Availability Zones for the DB cluster storage where DB cluster instances can be created. RDS automatically assigns 3 AZs if less than 3 AZs are configured, which will show as a difference requiring resource recreation next Terraform apply"
-  type        = list(string)
-  default     = null
-}
-
-variable "cluster_backtrack_window" {
-  description = "The target backtrack window, in seconds. Only available for `aurora` engine currently. To disable backtracking, set this value to 0. Must be between 0 and 259200 (72 hours)"
-  type        = number
-  default     = null
-}
-
-variable "cluster_members" {
-  description = "List of RDS Instances that are a part of this cluster"
-  type        = list(string)
-  default     = null
-}
-
-variable "cluster_enable_global_write_forwarding" {
-  description = "Whether cluster should forward writes to an associated global cluster. Applied to secondary clusters to enable them to forward writes to an `aws_rds_global_cluster`'s primary cluster"
-  type        = bool
-  default     = null
-}
-
-variable "cluster_enable_http_endpoint" {
-  description = "Enable HTTP endpoint (data API). Only valid when engine_mode is set to `serverless`"
-  type        = bool
-  default     = null
-}
-
-variable "cluster_engine_mode" {
-  description = "The database engine mode. Valid values: `global`, `multimaster`, `parallelquery`, `provisioned`, `serverless`. Defaults to: `provisioned`"
-  type        = string
-  default     = "provisioned"
-}
-
-variable "cluster_global_cluster_identifier" {
-  description = "The global cluster identifier specified on `aws_rds_global_cluster`"
-  type        = string
-  default     = null
-}
-
-variable "cluster_replication_source_identifier" {
-  description = "ARN of a source DB cluster or DB instance if this DB cluster is to be created as a Read Replica"
-  type        = string
-  default     = null
-}
-
-variable "cluster_scaling_configuration" {
-  description = "Map of nested attributes with scaling properties. Only valid when `engine_mode` is set to `serverless`"
-  type        = map(string)
-  default     = {}
-}
-
-variable "cluster_serverlessv2_scaling_configuration" {
-  description = "Map of nested attributes with serverless v2 scaling properties. Only valid when `engine_mode` is set to `provisioned`"
-  type        = map(string)
-  default     = {}
-}
-
-variable "cluster_source_region" {
-  description = "The source region for an encrypted replica DB cluster"
-  type        = string
-  default     = null
-}
-
-variable "cluster_tags" { # TODO: Do we need this?
-  description = "A map of tags to add to only the cluster. Used for AWS Instance Scheduler tagging"
-  type        = map(string)
-  default     = {}
-}
-
-variable "cluster_timeouts" {
-  description = "Create, update, and delete timeout configurations for the cluster"
-  type        = map(string)
-  default     = {}
-}
-
-variable "cluster_instances" {
-  description = "Map of cluster instances and any specific/overriding attributes to be created"
-  type        = any
-  default     = {}
-}
-
-variable "cluster_db_instance_count" {
-type = number
-}
-
-variable "cluster_instances_use_identifier_prefix" {
-  description = "Determines whether cluster instance identifiers are used as prefixes"
-  type        = bool
-  default     = false
-}
-
-
-variable "cluster_endpoints" {
-  description = "Map of additional cluster endpoints and their attributes to be created"
-  type        = any
-  default     = {}
-}
-
-
-variable "cluster_iam_roles" { # ? custom_iam_instance_profile ??
-  description = "Map of IAM roles and supported feature names to associate with the cluster"
-  type        = map(map(string))
-  default     = {}
-}
-
-
-################################################################################
-# Cluster Autoscaling
-################################################################################
-
-variable "cluster_autoscaling_enabled" {
-  description = "Determines whether autoscaling of the cluster read replicas is enabled"
-  type        = bool
-  default     = false
-}
-
-variable "cluster_autoscaling_max_capacity" {
-  description = "Maximum number of read replicas permitted when autoscaling is enabled"
-  type        = number
-  default     = 2
-}
-
-variable "cluster_autoscaling_min_capacity" {
-  description = "Minimum number of read replicas permitted when autoscaling is enabled"
-  type        = number
-  default     = 0
-}
-
-variable "cluster_autoscaling_policy_name" {
-  description = "Autoscaling policy name"
-  type        = string
-  default     = "target-metric"
-}
-
-variable "cluster_predefined_metric_type" {
-  description = "The metric type to scale on. Valid values are `RDSReaderAverageCPUUtilization` and `RDSReaderAverageDatabaseConnections`"
-  type        = string
-  default     = "RDSReaderAverageCPUUtilization"
-}
-
-variable "cluster_autoscaling_scale_in_cooldown" {
-  description = "Cooldown in seconds before allowing further scaling operations after a scale in"
-  type        = number
-  default     = 300
-}
-
-variable "cluster_autoscaling_scale_out_cooldown" {
-  description = "Cooldown in seconds before allowing further scaling operations after a scale out"
-  type        = number
-  default     = 300
-}
-
-variable "cluster_autoscaling_target_cpu" {
-  description = "CPU threshold which will initiate autoscaling"
-  type        = number
-  default     = 70
-}
-
-variable "cluster_autoscaling_target_connections" {
-  description = "Average number of connections threshold which will initiate autoscaling. Default value is 70% of db.r4/r5/r6g.large's default max_connections"
-  type        = number
-  default     = 700
-}
-
-################################################################################
-# Cluster Activity Stream
-################################################################################
-
-variable "create_db_cluster_activity_stream" {
-  description = "Determines whether a cluster activity stream is created."
-  type        = bool
-  default     = false
-}
-
-variable "cluster_activity_stream_mode" {
-  description = "Specifies the mode of the database activity stream. Database events such as a change or access generate an activity stream event. One of: sync, async"
-  type        = string
-  default     = null
-}
-
-variable "cluster_activity_stream_kms_key_id" {
-  description = "The AWS KMS key identifier for encrypting messages in the database activity stream"
-  type        = string
-  default     = null
-}
-
-variable "cluster_engine_native_audit_fields_included" {
-  description = "Specifies whether the database activity stream includes engine-native audit fields. This option only applies to an Oracle DB instance. By default, no engine-native audit fields are included"
-  type        = bool
-  default     = false
-}
-
-
-################################################################################
-# Proxy settings
-################################################################################
-
-variable "include_proxy" {
-  description = "Optionally include proxy to help manage database connections"
-  type        = bool
-  default = false
-}
-
-variable "proxy_debug_logging" {
-  description = "Turn on debug logging for the proxy"
-  default = false
-}
-
-variable "idle_client_timeout" {
-  description = "Idle client timeout of the RDS proxy (keep connection alive)"
-  default = 1800
-}
-
-variable "proxy_require_tls" {
-  description = "Require tls on the RDS proxy. Default: true"
-  type = bool
-  default = true
-}
-
-variable "proxy_name" {
-  description = "Name of the RDS proxy. Will be auto-generated if not specified"
-  type = string
-  default = null
-}
-
-variable "proxy_engine_family" {
-  description = "Engine family of the RDS proxy. Default: POSTGRESQL"
-  type = string
-  default = "POSTGRESQL"
-}
-
-# get inspiration from https://dev.azure.com/dfds/Phoenix/_git/aws-modules-rds?path=/variables.tf&version=GBmaster
-
-variable "vpc_id" { # TODO: include?
-  type = string
-  default = null
-}
-variable "rds_proxy_security_group_ids" { # TODO: remove
-  type        = list(string)
-  default     = []
 }
