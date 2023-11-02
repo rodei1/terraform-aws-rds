@@ -100,7 +100,7 @@ variable "engine_version" {
   description = "The engine version to use"
   type        = string
 #   default     = null
-  default = "14"
+  default = "14.9"
 }
 
 variable "skip_final_snapshot" {
@@ -345,25 +345,26 @@ variable "db_subnet_group_tags" {
 }
 
 # DB subnet group
-variable "create_db_subnet_group" {
-  description = "Whether to create a database subnet group"
-  type        = bool
-  default     = false
+# variable "create_db_subnet_group" {
+#   description = "Whether to create a database subnet group"
+#   type        = bool
+#   default     = false
 
-}
+# }
 
 variable "db_subnet_group_name" {
   description = "Name of DB subnet group. DB instance will be created in the VPC associated with the DB subnet group. If unspecified, will be created in the default VPC"
   type        = string
-#   default     = null # required # it can be null
+  default     = null # required # it can be null ?
 }
 
+# TODO: Remove
 variable "db_subnet_group_use_name_prefix" {
   description = "Determines whether to use `subnet_group_name` as is or create a unique name beginning with the `subnet_group_name` as the prefix"
   type        = bool
-  default     = true
+  default     = false
 }
-
+# TODO: Remove
 variable "db_subnet_group_description" {
   description = "Description of the DB subnet group to create"
   type        = string
@@ -401,7 +402,13 @@ variable "parameter_group_description" {
   default     = null
 }
 
-variable "family" {
+variable "parameter_group_family" {
+  description = "The family of the DB parameter group"
+  type        = string
+  default     = null # varies depending on engine and version and instance type
+}
+
+variable "family" { # TODO: Remove
   description = "The family of the DB parameter group"
   type        = string
   default     = null # varies depending on engine and version and instance type
