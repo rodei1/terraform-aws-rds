@@ -20,9 +20,15 @@ Terraform module for AWS RDS instances
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_cluster"></a> [cluster](#module\_cluster) | ./_sub/terraform-aws-rds-aurora | n/a |
-| <a name="module_db"></a> [db](#module\_db) | ./_sub/terraform-aws-rds | n/a |
-| <a name="module_db_proxy"></a> [db\_proxy](#module\_db\_proxy) | ./_sub/terraform-aws-rds-proxy | n/a |
+| <a name="module_cluster_parameters"></a> [cluster\_parameters](#module\_cluster\_parameters) | ./modules/cluster_parameter_group | n/a |
+| <a name="module_cw_log_group"></a> [cw\_log\_group](#module\_cw\_log\_group) | ./modules/cloudwatch_log_groups | n/a |
+| <a name="module_db_cluster_serverless"></a> [db\_cluster\_serverless](#module\_db\_cluster\_serverless) | ./modules/rds_aurora | n/a |
+| <a name="module_db_instance"></a> [db\_instance](#module\_db\_instance) | ./modules/rds_instance | n/a |
+| <a name="module_db_multi_az_cluster"></a> [db\_multi\_az\_cluster](#module\_db\_multi\_az\_cluster) | ./modules/rds_aurora | n/a |
+| <a name="module_db_parameter_group"></a> [db\_parameter\_group](#module\_db\_parameter\_group) | ./modules/instance_parameter_group | n/a |
+| <a name="module_db_proxy"></a> [db\_proxy](#module\_db\_proxy) | ./modules/rds_proxy | n/a |
+| <a name="module_db_subnet_group"></a> [db\_subnet\_group](#module\_db\_subnet\_group) | ./modules/rds_subnet_group | n/a |
+| <a name="module_enhanced_monitoring_iam_role"></a> [enhanced\_monitoring\_iam\_role](#module\_enhanced\_monitoring\_iam\_role) | ./modules/enhanced_monitoring_role | n/a |
 
 ## Resources
 
@@ -58,7 +64,7 @@ Terraform module for AWS RDS instances
 | <a name="input_cluster_autoscaling_target_cpu"></a> [cluster\_autoscaling\_target\_cpu](#input\_cluster\_autoscaling\_target\_cpu) | CPU threshold which will initiate autoscaling | `number` | `70` | no |
 | <a name="input_cluster_availability_zones"></a> [cluster\_availability\_zones](#input\_cluster\_availability\_zones) | List of EC2 Availability Zones for the DB cluster storage where DB cluster instances can be created. RDS automatically assigns 3 AZs if less than 3 AZs are configured, which will show as a difference requiring resource recreation next Terraform apply | `list(string)` | `null` | no |
 | <a name="input_cluster_backtrack_window"></a> [cluster\_backtrack\_window](#input\_cluster\_backtrack\_window) | The target backtrack window, in seconds. Only available for `aurora` engine currently. To disable backtracking, set this value to 0. Must be between 0 and 259200 (72 hours) | `number` | `null` | no |
-| <a name="input_cluster_db_instance_count"></a> [cluster\_db\_instance\_count](#input\_cluster\_db\_instance\_count) | n/a | `number` | n/a | yes |
+| <a name="input_cluster_db_instance_count"></a> [cluster\_db\_instance\_count](#input\_cluster\_db\_instance\_count) | n/a | `number` | `0` | no |
 | <a name="input_cluster_enable_global_write_forwarding"></a> [cluster\_enable\_global\_write\_forwarding](#input\_cluster\_enable\_global\_write\_forwarding) | Whether cluster should forward writes to an associated global cluster. Applied to secondary clusters to enable them to forward writes to an `aws_rds_global_cluster`'s primary cluster | `bool` | `null` | no |
 | <a name="input_cluster_enable_http_endpoint"></a> [cluster\_enable\_http\_endpoint](#input\_cluster\_enable\_http\_endpoint) | Enable HTTP endpoint (data API). Only valid when engine\_mode is set to `serverless` | `bool` | `null` | no |
 | <a name="input_cluster_endpoints"></a> [cluster\_endpoints](#input\_cluster\_endpoints) | Map of additional cluster endpoints and their attributes to be created | `any` | `{}` | no |
@@ -84,7 +90,6 @@ Terraform module for AWS RDS instances
 | <a name="input_create_db_instance"></a> [create\_db\_instance](#input\_create\_db\_instance) | Whether to create a database instance | `bool` | `true` | no |
 | <a name="input_create_db_option_group"></a> [create\_db\_option\_group](#input\_create\_db\_option\_group) | Create a database option group | `bool` | `true` | no |
 | <a name="input_create_db_parameter_group"></a> [create\_db\_parameter\_group](#input\_create\_db\_parameter\_group) | Whether to create a database parameter group | `bool` | `true` | no |
-| <a name="input_create_db_subnet_group"></a> [create\_db\_subnet\_group](#input\_create\_db\_subnet\_group) | Whether to create a database subnet group | `bool` | `false` | no |
 | <a name="input_create_monitoring_role"></a> [create\_monitoring\_role](#input\_create\_monitoring\_role) | Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs | `bool` | `false` | no |
 | <a name="input_custom_iam_instance_profile"></a> [custom\_iam\_instance\_profile](#input\_custom\_iam\_instance\_profile) | RDS custom iam instance profile | `string` | `null` | no |
 | <a name="input_db_instance_tags"></a> [db\_instance\_tags](#input\_db\_instance\_tags) | Additional tags for the DB instance | `map(string)` | `{}` | no |
@@ -92,16 +97,16 @@ Terraform module for AWS RDS instances
 | <a name="input_db_option_group_tags"></a> [db\_option\_group\_tags](#input\_db\_option\_group\_tags) | Additional tags for the DB option group | `map(string)` | `{}` | no |
 | <a name="input_db_parameter_group_tags"></a> [db\_parameter\_group\_tags](#input\_db\_parameter\_group\_tags) | Additional tags for the  DB parameter group | `map(string)` | `{}` | no |
 | <a name="input_db_subnet_group_description"></a> [db\_subnet\_group\_description](#input\_db\_subnet\_group\_description) | Description of the DB subnet group to create | `string` | `null` | no |
-| <a name="input_db_subnet_group_name"></a> [db\_subnet\_group\_name](#input\_db\_subnet\_group\_name) | Name of DB subnet group. DB instance will be created in the VPC associated with the DB subnet group. If unspecified, will be created in the default VPC | `string` | n/a | yes |
+| <a name="input_db_subnet_group_name"></a> [db\_subnet\_group\_name](#input\_db\_subnet\_group\_name) | Name of DB subnet group. DB instance will be created in the VPC associated with the DB subnet group. If unspecified, will be created in the default VPC | `string` | `null` | no |
 | <a name="input_db_subnet_group_tags"></a> [db\_subnet\_group\_tags](#input\_db\_subnet\_group\_tags) | Additional tags for the DB subnet group | `map(string)` | `{}` | no |
-| <a name="input_db_subnet_group_use_name_prefix"></a> [db\_subnet\_group\_use\_name\_prefix](#input\_db\_subnet\_group\_use\_name\_prefix) | Determines whether to use `subnet_group_name` as is or create a unique name beginning with the `subnet_group_name` as the prefix | `bool` | `true` | no |
+| <a name="input_db_subnet_group_use_name_prefix"></a> [db\_subnet\_group\_use\_name\_prefix](#input\_db\_subnet\_group\_use\_name\_prefix) | Determines whether to use `subnet_group_name` as is or create a unique name beginning with the `subnet_group_name` as the prefix | `bool` | `false` | no |
 | <a name="input_delete_automated_backups"></a> [delete\_automated\_backups](#input\_delete\_automated\_backups) | Specifies whether to remove automated backups immediately after the DB instance is deleted | `bool` | `true` | no |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | The database can't be deleted when this value is set to true | `bool` | `false` | no |
 | <a name="input_domain"></a> [domain](#input\_domain) | The ID of the Directory Service Active Directory domain to create the instance in | `string` | `null` | no |
 | <a name="input_domain_iam_role_name"></a> [domain\_iam\_role\_name](#input\_domain\_iam\_role\_name) | (Required if domain is provided) The name of the IAM role to be used when making API calls to the Directory Service | `string` | `null` | no |
 | <a name="input_enabled_cloudwatch_logs_exports"></a> [enabled\_cloudwatch\_logs\_exports](#input\_enabled\_cloudwatch\_logs\_exports) | List of log types to enable for exporting to CloudWatch logs. If omitted, no logs will be exported. Valid values (depending on engine): alert, audit, error, general, listener, slowquery, trace, postgresql (PostgreSQL), upgrade (PostgreSQL) | `list(string)` | `[]` | no |
 | <a name="input_engine"></a> [engine](#input\_engine) | The database engine to use | `string` | `"postgres"` | no |
-| <a name="input_engine_version"></a> [engine\_version](#input\_engine\_version) | The engine version to use | `string` | `"14"` | no |
+| <a name="input_engine_version"></a> [engine\_version](#input\_engine\_version) | The engine version to use | `string` | `"14.9"` | no |
 | <a name="input_family"></a> [family](#input\_family) | The family of the DB parameter group | `string` | `null` | no |
 | <a name="input_final_snapshot_identifier_prefix"></a> [final\_snapshot\_identifier\_prefix](#input\_final\_snapshot\_identifier\_prefix) | The name which is prefixed to the final snapshot on cluster destroy | `string` | `"final"` | no |
 | <a name="input_iam_database_authentication_enabled"></a> [iam\_database\_authentication\_enabled](#input\_iam\_database\_authentication\_enabled) | Specifies whether or not the mappings of AWS Identity and Access Management (IAM) accounts to database accounts are enabled | `bool` | `false` | no |
@@ -112,6 +117,7 @@ Terraform module for AWS RDS instances
 | <a name="input_instance_use_identifier_prefix"></a> [instance\_use\_identifier\_prefix](#input\_instance\_use\_identifier\_prefix) | Determines whether to use `identifier` as is or create a unique identifier beginning with `identifier` as the specified prefix | `bool` | `false` | no |
 | <a name="input_iops"></a> [iops](#input\_iops) | The amount of provisioned IOPS. Setting this implies a storage\_type of 'io1' or `gp3`. See `notes` for limitations regarding this variable for `gp3` | `number` | `null` | no |
 | <a name="input_is_db_cluster"></a> [is\_db\_cluster](#input\_is\_db\_cluster) | n/a | `bool` | `false` | no |
+| <a name="input_is_serverless"></a> [is\_serverless](#input\_is\_serverless) | n/a | `bool` | `false` | no |
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | The ARN for the KMS encryption key. If creating an encrypted replica, set this to the destination KMS ARN. If storage\_encrypted is set to true and kms\_key\_id is not specified the default KMS key created in your account will be used. Be sure to use the full ARN, not a key alias. | `string` | `null` | no |
 | <a name="input_license_model"></a> [license\_model](#input\_license\_model) | License model information for this DB instance. Optional, but required for some DB engines, i.e. Oracle SE1 | `string` | `null` | no |
 | <a name="input_maintenance_window"></a> [maintenance\_window](#input\_maintenance\_window) | The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00' | `string` | `"Sat:21:00-Sun:01:00"` | no |
@@ -135,6 +141,7 @@ Terraform module for AWS RDS instances
 | <a name="input_option_group_use_name_prefix"></a> [option\_group\_use\_name\_prefix](#input\_option\_group\_use\_name\_prefix) | Determines whether to use `option_group_name` as is or create a unique name beginning with the `option_group_name` as the prefix | `bool` | `true` | no |
 | <a name="input_options"></a> [options](#input\_options) | A list of Options to apply | `any` | `[]` | no |
 | <a name="input_parameter_group_description"></a> [parameter\_group\_description](#input\_parameter\_group\_description) | Description of the DB parameter group to create | `string` | `null` | no |
+| <a name="input_parameter_group_family"></a> [parameter\_group\_family](#input\_parameter\_group\_family) | The family of the DB parameter group | `string` | `null` | no |
 | <a name="input_parameter_group_name"></a> [parameter\_group\_name](#input\_parameter\_group\_name) | Name of the DB parameter group to associate or create | `string` | `null` | no |
 | <a name="input_parameter_group_use_name_prefix"></a> [parameter\_group\_use\_name\_prefix](#input\_parameter\_group\_use\_name\_prefix) | Determines whether to use `parameter_group_name` as is or create a unique name beginning with the `parameter_group_name` as the prefix | `bool` | `true` | no |
 | <a name="input_parameters"></a> [parameters](#input\_parameters) | A list of DB parameters (map) to apply | `list(map(string))` | `[]` | no |
