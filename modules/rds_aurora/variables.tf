@@ -1,9 +1,3 @@
-# variable "create" {
-#   description = "Whether cluster should be created (affects nearly all resources)"
-#   type        = bool
-#   default     = true
-# }
-
 variable "name" { # TODO: rename to identifier?
   description = "Name used across resources created"
   type        = string
@@ -20,23 +14,11 @@ variable "tags" {
 # # DB Subnet Group
 # ################################################################################
 
-# variable "create_db_subnet_group" {
-#   description = "Determines whether to create the database subnet group or use existing"
-#   type        = bool
-#   default     = false
-# }
-
 variable "db_subnet_group_name" {
   description = "The name of the subnet group name (existing or created)"
   type        = string
   # default     = ""
 }
-
-# variable "subnets" {
-#   description = "List of subnet IDs used by database subnet group created"
-#   type        = list(string)
-#   default     = []
-# }
 
 ################################################################################
 # Cluster
@@ -423,65 +405,11 @@ variable "iam_roles" {
 # Enhanced Monitoring
 ################################################################################
 
-# variable "create_monitoring_role" {
-#   description = "Determines whether to create the IAM role for RDS enhanced monitoring"
-#   type        = bool
-#   default     = true
-# }
-
 variable "monitoring_role_arn" {
   description = "IAM role used by RDS to send enhanced monitoring metrics to CloudWatch"
   type        = string
   default     = ""
 }
-
-# variable "iam_role_name" {
-#   description = "Friendly name of the monitoring role"
-#   type        = string
-#   default     = null
-# }
-
-# variable "iam_role_use_name_prefix" {
-#   description = "Determines whether to use `iam_role_name` as is or create a unique name beginning with the `iam_role_name` as the prefix"
-#   type        = bool
-#   default     = false
-# }
-
-# variable "iam_role_description" {
-#   description = "Description of the monitoring role"
-#   type        = string
-#   default     = null
-# }
-
-# variable "iam_role_path" {
-#   description = "Path for the monitoring role"
-#   type        = string
-#   default     = null
-# }
-
-# variable "iam_role_managed_policy_arns" {
-#   description = "Set of exclusive IAM managed policy ARNs to attach to the monitoring role"
-#   type        = list(string)
-#   default     = null
-# }
-
-# variable "iam_role_permissions_boundary" {
-#   description = "The ARN of the policy that is used to set the permissions boundary for the monitoring role"
-#   type        = string
-#   default     = null
-# }
-
-# variable "iam_role_force_detach_policies" {
-#   description = "Whether to force detaching any policies the monitoring role has before destroying it"
-#   type        = bool
-#   default     = null
-# }
-
-# variable "iam_role_max_session_duration" {
-#   description = "Maximum session duration (in seconds) that you want to set for the monitoring role"
-#   type        = number
-#   default     = null
-# }
 
 ################################################################################
 # Autoscaling
@@ -569,12 +497,6 @@ variable "security_group_description" {
   default     = null
 }
 
-# variable "vpc_id" {
-#   description = "ID of the VPC where to create security group"
-#   type        = string
-#   default     = ""
-# }
-
 variable "security_group_rules" {
   description = "Map of security group rules to add to the cluster security group created"
   type        = any
@@ -586,16 +508,6 @@ variable "security_group_tags" {
   type        = map(string)
   default     = {}
 }
-
-# ################################################################################
-# # Cluster Parameter Group
-# ################################################################################
-
-# variable "create_db_cluster_parameter_group" {
-#   description = "Determines whether a cluster parameter should be created or use existing"
-#   type        = bool
-#   default     = false
-# }
 
 variable "db_cluster_parameter_group_name" {
   description = "The name of the DB cluster parameter group"
