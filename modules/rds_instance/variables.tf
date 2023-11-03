@@ -1,9 +1,3 @@
-# variable "create" {
-#   description = "Whether to create this resource or not?"
-#   type        = bool
-#   default     = true
-# }
-
 variable "identifier" {
   description = "The name of the RDS instance"
   type        = string
@@ -221,42 +215,6 @@ variable "monitoring_role_arn" {
   default     = null
 }
 
-# variable "monitoring_role_name" {
-#   description = "Name of the IAM role which will be created when create_monitoring_role is enabled."
-#   type        = string
-#   default     = "rds-monitoring-role"
-# }
-
-# variable "monitoring_role_use_name_prefix" {
-#   description = "Determines whether to use `monitoring_role_name` as is or create a unique identifier beginning with `monitoring_role_name` as the specified prefix"
-#   type        = bool
-#   default     = false
-# }
-
-# variable "monitoring_role_description" {
-#   description = "Description of the monitoring IAM role"
-#   type        = string
-#   default     = null
-# }
-
-# variable "monitoring_role_permissions_boundary" {
-#   description = "ARN of the policy that is used to set the permissions boundary for the monitoring IAM role"
-#   type        = string
-#   default     = null
-# }
-
-# variable "monitoring_iam_role_path" {
-#   description = "Path for the monitoring role"
-#   type        = string
-#   default     = null
-# }
-
-# variable "create_monitoring_role" {
-#   description = "Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs."
-#   type        = bool
-#   default     = false
-# }
-
 variable "allow_major_version_upgrade" {
   description = "Indicates that major version upgrades are allowed. Changing this parameter does not result in an outage and the change is asynchronously applied as soon as possible"
   type        = bool
@@ -401,31 +359,3 @@ variable "network_type" {
   type        = string
   default     = null
 }
-
-# ################################################################################
-# # CloudWatch Log Group
-# ################################################################################
-
-# variable "create_cloudwatch_log_group" {
-#   description = "Determines whether a CloudWatch log group is created for each `enabled_cloudwatch_logs_exports`"
-#   type        = bool
-#   default     = false
-# }
-
-# variable "cloudwatch_log_group_retention_in_days" {
-#   description = "The number of days to retain CloudWatch logs for the DB instance"
-#   type        = number
-#   default     = 7
-# }
-
-# variable "cloudwatch_log_group_kms_key_id" {
-#   description = "The ARN of the KMS Key to use when encrypting log data"
-#   type        = string
-#   default     = null
-# }
-
-# variable "cloudwatch_log_group_skip_destroy_on_deletion" {
-#   description = "value to skip destroy ClouwWatch log group on deletion"
-#   type = bool
-#   default = false
-# }

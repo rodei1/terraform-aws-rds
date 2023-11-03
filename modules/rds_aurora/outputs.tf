@@ -1,13 +1,4 @@
 ################################################################################
-# DB Subnet Group
-################################################################################
-
-# output "db_subnet_group_name" {
-#   description = "The db subnet group name"
-#   value       = local.db_subnet_group_name
-# }
-
-################################################################################
 # Cluster
 ################################################################################
 
@@ -110,71 +101,6 @@ output "cluster_role_associations" {
   description = "A map of IAM roles associated with the cluster and their attributes"
   value       = aws_rds_cluster_role_association.this
 }
-
-# ################################################################################
-# # Enhanced Monitoring
-# ################################################################################
-
-# output "enhanced_monitoring_iam_role_name" {
-#   description = "The name of the enhanced monitoring role"
-#   value       = try(aws_iam_role.rds_enhanced_monitoring[0].name, null)
-# }
-
-# output "enhanced_monitoring_iam_role_arn" {
-#   description = "The Amazon Resource Name (ARN) specifying the enhanced monitoring role"
-#   value       = try(aws_iam_role.rds_enhanced_monitoring[0].arn, null)
-# }
-
-# output "enhanced_monitoring_iam_role_unique_id" {
-#   description = "Stable and unique string identifying the enhanced monitoring role"
-#   value       = try(aws_iam_role.rds_enhanced_monitoring[0].unique_id, null)
-# }
-
-################################################################################
-# Security Group
-################################################################################
-
-# output "security_group_id" {
-#   description = "The security group ID of the cluster"
-#   value       = try(aws_security_group.this[0].id, null)
-# }
-
-# ################################################################################
-# # Cluster Parameter Group
-# ################################################################################
-
-# output "db_cluster_parameter_group_arn" {
-#   description = "The ARN of the DB cluster parameter group created"
-#   value       = try(aws_rds_cluster_parameter_group.this[0].arn, null)
-# }
-
-# output "db_cluster_parameter_group_id" {
-#   description = "The ID of the DB cluster parameter group created"
-#   value       = try(aws_rds_cluster_parameter_group.this[0].id, null)
-# }
-
-# ################################################################################
-# # DB Parameter Group
-# ################################################################################
-
-# output "db_parameter_group_arn" {
-#   description = "The ARN of the DB parameter group created"
-#   value       = try(aws_db_parameter_group.this[0].arn, null)
-# }
-
-# output "db_parameter_group_id" {
-#   description = "The ID of the DB parameter group created"
-#   value       = try(aws_db_parameter_group.this[0].id, null)
-# }
-
-# ################################################################################
-# # CloudWatch Log Group
-# ################################################################################
-
-# output "db_cluster_cloudwatch_log_groups" {
-#   description = "Map of CloudWatch log groups created and their attributes"
-#   value       = aws_cloudwatch_log_group.this
-# }
 
 ################################################################################
 # Cluster Activity Stream
