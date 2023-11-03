@@ -1,5 +1,5 @@
 locals {
-  role_arn    = var.create && var.create_iam_role ? aws_iam_role.this[0].arn : var.role_arn
+  role_arn    = var.create_iam_role ? aws_iam_role.this[0].arn : var.role_arn
   role_name   = coalesce(var.iam_role_name, var.name)
   policy_name = coalesce(var.iam_policy_name, var.name)
 }
@@ -12,8 +12,6 @@ data "aws_partition" "current" {}
 ################################################################################
 
 resource "aws_db_proxy" "this" {
-  count = var.create ? 1 : 0
-
   dynamic "auth" {
     for_each = var.auth
 
@@ -42,9 +40,7 @@ resource "aws_db_proxy" "this" {
 }
 
 resource "aws_db_proxy_default_target_group" "this" {
-  count = var.create ? 1 : 0
-
-  db_proxy_name = aws_db_proxy.this[0].name
+  db_proxy_name = aws_db_proxy.this.name
 
   connection_pool_config {
     connection_borrow_timeout    = var.connection_borrow_timeout
@@ -56,25 +52,25 @@ resource "aws_db_proxy_default_target_group" "this" {
 }
 
 resource "aws_db_proxy_target" "db_instance" {
-  count = var.create && var.target_db_instance ? 1 : 0
+  count = var.target_db_instance ? 1 : 0
 
-  db_proxy_name          = aws_db_proxy.this[0].name
-  target_group_name      = aws_db_proxy_default_target_group.this[0].name
+  db_proxy_name          = aws_db_proxy.this.name
+  target_group_name      = aws_db_proxy_default_target_group.this.name
   db_instance_identifier = var.db_instance_identifier
 }
 
 resource "aws_db_proxy_target" "db_cluster" {
-  count = var.create && var.target_db_cluster ? 1 : 0
+  count = var.target_db_cluster ? 1 : 0
 
-  db_proxy_name         = aws_db_proxy.this[0].name
-  target_group_name     = aws_db_proxy_default_target_group.this[0].name
+  db_proxy_name         = aws_db_proxy.this.name
+  target_group_name     = aws_db_proxy_default_target_group.this.name
   db_cluster_identifier = var.db_cluster_identifier
 }
 
 resource "aws_db_proxy_endpoint" "this" {
-  for_each = { for k, v in var.endpoints : k => v if var.create }
+  for_each = { for k, v in var.endpoints : k => v }
 
-  db_proxy_name          = aws_db_proxy.this[0].name
+  db_proxy_name          = aws_db_proxy.this.name
   db_proxy_endpoint_name = each.value.name
   vpc_subnet_ids         = each.value.vpc_subnet_ids
   vpc_security_group_ids = lookup(each.value, "vpc_security_group_ids", null)
@@ -88,7 +84,7 @@ resource "aws_db_proxy_endpoint" "this" {
 ################################################################################
 
 resource "aws_cloudwatch_log_group" "this" {
-  count = var.create && var.manage_log_group ? 1 : 0
+  count = var.manage_log_group ? 1 : 0
 
   name              = "/aws/rds/proxy/${var.name}"
   retention_in_days = var.log_group_retention_in_days
@@ -103,7 +99,7 @@ resource "aws_cloudwatch_log_group" "this" {
 ################################################################################
 
 data "aws_iam_policy_document" "assume_role" {
-  count = var.create && var.create_iam_role ? 1 : 0
+  count = var.create_iam_role ? 1 : 0
 
   statement {
     sid     = "RDSAssume"
@@ -118,7 +114,7 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "this" {
-  count = var.create && var.create_iam_role ? 1 : 0
+  count = var.create_iam_role ? 1 : 0
 
   name        = var.use_role_name_prefix ? null : local.role_name
   name_prefix = var.use_role_name_prefix ? "${local.role_name}-" : null
@@ -134,7 +130,7 @@ resource "aws_iam_role" "this" {
 }
 
 data "aws_iam_policy_document" "this" {
-  count = var.create && var.create_iam_role && var.create_iam_policy ? 1 : 0
+  count = var.create_iam_role && var.create_iam_policy ? 1 : 0
 
   statement {
     sid     = "DecryptSecrets"
@@ -179,7 +175,7 @@ data "aws_iam_policy_document" "this" {
 }
 
 resource "aws_iam_role_policy" "this" {
-  count = var.create && var.create_iam_role && var.create_iam_policy ? 1 : 0
+  count = var.create_iam_role && var.create_iam_policy ? 1 : 0
 
   name        = var.use_policy_name_prefix ? null : local.policy_name
   name_prefix = var.use_policy_name_prefix ? "${local.policy_name}-" : null

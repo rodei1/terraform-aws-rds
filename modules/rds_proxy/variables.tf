@@ -1,9 +1,3 @@
-variable "create" {
-  description = "Whether cluster should be created (affects nearly all resources)"
-  type        = bool
-  default     = true
-}
-
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)

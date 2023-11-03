@@ -1,33 +1,33 @@
 # RDS Proxy
 output "proxy_id" {
   description = "The ID for the proxy"
-  value       = try(aws_db_proxy.this[0].id, null)
+  value       = try(aws_db_proxy.this.id, null)
 }
 
 output "proxy_arn" {
   description = "The Amazon Resource Name (ARN) for the proxy"
-  value       = try(aws_db_proxy.this[0].arn, null)
+  value       = try(aws_db_proxy.this.arn, null)
 }
 
 output "proxy_endpoint" {
   description = "The endpoint that you can use to connect to the proxy"
-  value       = try(aws_db_proxy.this[0].endpoint, null)
+  value       = try(aws_db_proxy.this.endpoint, null)
 }
 
 # Proxy Default Target Group
 output "proxy_default_target_group_id" {
   description = "The ID for the default target group"
-  value       = try(aws_db_proxy_default_target_group.this[0].id, null)
+  value       = try(aws_db_proxy_default_target_group.this.id, null)
 }
 
 output "proxy_default_target_group_arn" {
   description = "The Amazon Resource Name (ARN) for the default target group"
-  value       = try(aws_db_proxy_default_target_group.this[0].arn, null)
+  value       = try(aws_db_proxy_default_target_group.this.arn, null)
 }
 
 output "proxy_default_target_group_name" {
   description = "The name of the default target group"
-  value       = try(aws_db_proxy_default_target_group.this[0].name, null)
+  value       = try(aws_db_proxy_default_target_group.this.name, null)
 }
 
 # Proxy Target

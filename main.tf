@@ -52,7 +52,7 @@ locals {
   # DB Proxy configuration
   ########################################################################
   proxy_name = var.proxy_name == null ? "${var.identifier}" : var.proxy_name
-  db_proxy_secret_arn = null #(var.is_db_cluster || local.is_serverless) ? coalesce(try(module.db_cluster[0].cluster_master_user_secret_arn,null), try(module.db_cluster_serverless[0].cluster_master_user_secret_arn,null)) : module.db_instance[0].db_instance_master_user_secret_arn
+  db_proxy_secret_arn = (var.is_db_cluster || local.is_serverless) ? coalesce(try(module.db_multi_az_cluster[0].cluster_master_user_secret_arn,null), try(module.db_cluster_serverless[0].cluster_master_user_secret_arn,null)) : module.db_instance[0].db_instance_master_user_secret_arn
 
   proxy_auth_config = {
     (var.username) = {
@@ -72,7 +72,7 @@ locals {
 
   backup_retention_period = var.backup_retention_period == null ? 0 : var.backup_retention_period
 
-  is_serverless = true
+  is_serverless = var.is_serverless # temporary controlled by variable. TODO: Replace by calculation
 
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.final_snapshot_identifier_prefix}-${var.identifier}-${try(random_id.snapshot_identifier[0].hex, "")}"
 }
@@ -90,7 +90,7 @@ resource "random_id" "snapshot_identifier" {
 
 # Create a parameter group by default to contain the options we need
 module "db_parameter_group" {
-  source          = "./new_modules/db_parameter_group"
+  source          = "./modules/instance_parameter_group"
   count           = local.create_db_parameter_group ? 1: 0
   name            = var.identifier
   use_name_prefix = false #var.parameter_group_use_name_prefix
@@ -101,7 +101,7 @@ module "db_parameter_group" {
 }
 
 module "db_subnet_group" {
-  source          = "./new_modules/db_subnet_group"
+  source          = "./modules/rds_subnet_group"
   count           = local.create_db_subnet_group ? 1 : 0
   name            = coalesce(var.db_subnet_group_name, var.identifier)
   use_name_prefix = var.db_subnet_group_use_name_prefix
@@ -112,7 +112,7 @@ module "db_subnet_group" {
 }
 
 module "cw_log_group" {
-  source                                        = "./new_modules/db_cloudwatch_log_groups"
+  source                                        = "./modules/cloudwatch_log_groups"
   count                                         = local.create_cloudwatch_log_group ? 1 : 0
   db_identifier                                 = var.identifier
   enabled_cloudwatch_logs_exports               = var.enabled_cloudwatch_logs_exports
@@ -122,7 +122,7 @@ module "cw_log_group" {
 }
 
 module "enhanced_monitoring_iam_role" {
-  source                               = "./new_modules/db_enhanced_monitoring_role"
+  source                               = "./modules/enhanced_monitoring_role"
   count                                = local.create_monitoring_role ? 1 : 0
   monitoring_role_name                 = local.monitoring_role_name
   monitoring_role_use_name_prefix      = var.monitoring_role_use_name_prefix
@@ -131,9 +131,9 @@ module "enhanced_monitoring_iam_role" {
 }
 
 module "db_instance" {
-  source = "./new_modules/db_instance"
+  source = "./modules/rds_instance"
 
-  count                               = !var.is_db_cluster && local.is_serverless ? 1 : 0
+  count                               = !var.is_db_cluster && !local.is_serverless ? 1 : 0
   identifier                          = var.identifier
   use_identifier_prefix               = var.instance_use_identifier_prefix
   engine                              = var.engine
@@ -208,7 +208,7 @@ module "db_instance" {
 }
 
 module "cluster_parameters" {
-  source = "./new_modules/cluster_parameter_group"
+  source = "./modules/cluster_parameter_group"
   count = var.is_db_cluster ? 1 : 0
 
   db_cluster_parameter_group_name         = "${var.identifier}"
@@ -223,8 +223,8 @@ module "cluster_parameters" {
   ]
 }
 
-module "db_cluster" { # Multi-AZ DB Cluster
-  source = "./new_modules/rds-aurora"
+module "db_multi_az_cluster" {
+  source = "./modules/rds_aurora"
   count = var.is_db_cluster && !local.is_serverless ? 1 : 0
   name                                  = var.identifier
   cluster_use_name_prefix               = var.cluster_use_name_prefix
@@ -255,7 +255,7 @@ module "db_cluster" { # Multi-AZ DB Cluster
 
 
 module "db_cluster_serverless" {
-  source = "./new_modules/rds-aurora"
+  source = "./modules/rds_aurora"
   count = local.is_serverless ? 1 : 0
   name              = "${var.identifier}-postgresqlv2"
   engine            = "aurora-postgresql" #data.aws_rds_engine_version.postgresql.engine
@@ -294,8 +294,8 @@ module "db_cluster_serverless" {
 
 
 module "db_proxy" { # What is endpoints? specifc endpoints for read and or writes?
-  source = "./new_modules/rds-proxy"
-  create = var.include_proxy
+  source = "./modules/rds_proxy"
+  count = var.include_proxy ? 1 : 0
 
   tags = var.tags
   name = var.identifier # "proxy" default is identifier-proxy

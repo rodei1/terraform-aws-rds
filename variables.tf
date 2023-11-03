@@ -680,7 +680,8 @@ variable "cluster_instances" {
 }
 
 variable "cluster_db_instance_count" {
-type = number
+  type = number
+  default = 0
 }
 
 variable "cluster_instances_use_identifier_prefix" {
@@ -838,4 +839,10 @@ variable "vpc_id" { # TODO: include?
 variable "rds_proxy_security_group_ids" { # TODO: remove
   type        = list(string)
   default     = []
+}
+
+
+variable "is_serverless" { # tempprary variable for testing
+  type = bool
+  default = false
 }
