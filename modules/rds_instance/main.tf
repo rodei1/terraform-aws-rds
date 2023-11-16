@@ -9,6 +9,10 @@ locals {
   is_replica = var.replicate_source_db != null
 }
 
+data "aws_rds_certificate" "cert" {
+  latest_valid_till = true
+}
+
 resource "random_id" "snapshot_identifier" {
   count = !var.skip_final_snapshot ? 1 : 0
 
@@ -54,7 +58,7 @@ resource "aws_db_instance" "this" {
   iops                = var.iops
   storage_throughput  = var.storage_throughput
   publicly_accessible = var.publicly_accessible
-  ca_cert_identifier  = var.ca_cert_identifier
+  ca_cert_identifier  = var.ca_cert_identifier == null ? data.aws_rds_certificate.cert.id : var.ca_cert_identifier
 
   allow_major_version_upgrade = var.allow_major_version_upgrade
   auto_minor_version_upgrade  = var.auto_minor_version_upgrade
