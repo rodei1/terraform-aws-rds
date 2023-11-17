@@ -92,22 +92,22 @@ variable "domain_iam_role_name" {
 variable "engine" {
   description = "The database engine to use"
   type        = string
-#   default     = null
+  #   default     = null
   default = "postgres"
 }
 
 variable "engine_version" {
   description = "The engine version to use"
   type        = string
-#   default     = null
+  #   default     = null
   default = "14.9"
 }
 
 variable "skip_final_snapshot" {
   description = "Determines whether a final DB snapshot is created before the DB instance is deleted. If true is specified, no DBSnapshot is created. If false is specified, a DB snapshot is created before the DB instance is deleted"
   type        = bool
-#   default     = false
-  default     = true # Snapshots are already created by the AWS backup job.
+  #   default     = false
+  default = true # Snapshots are already created by the AWS backup job.
 }
 
 variable "snapshot_identifier" {
@@ -278,8 +278,8 @@ variable "apply_immediately" {
 variable "maintenance_window" {
   description = "The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00'"
   type        = string
-#   default     = null
-  default     = "Sat:21:00-Sun:01:00" # This is adjusted in accordance with AWS Backup schedule, see info here: https://wiki.dfds.cloud/en/playbooks/aws-backup/aws-backup-getting-started
+  #   default     = null
+  default = "Sat:21:00-Sun:01:00" # This is adjusted in accordance with AWS Backup schedule, see info here: https://wiki.dfds.cloud/en/playbooks/aws-backup/aws-backup-getting-started
 }
 # Continuous backup takes place between 1 and 5 AM UTC.
 # Snapshot backups take place between 3 and 7 AM UTC.
@@ -579,7 +579,7 @@ variable "cloudwatch_log_group_kms_key_id" {
 ################################################################################
 
 variable "is_db_cluster" {
-  type = bool
+  type    = bool
   default = false
 }
 
@@ -680,7 +680,7 @@ variable "cluster_instances" {
 }
 
 variable "cluster_db_instance_count" {
-  type = number
+  type    = number
   default = 0
 }
 
@@ -799,50 +799,50 @@ variable "cluster_engine_native_audit_fields_included" {
 variable "include_proxy" {
   description = "Optionally include proxy to help manage database connections"
   type        = bool
-  default = false
+  default     = false
 }
 
 variable "proxy_debug_logging" {
   description = "Turn on debug logging for the proxy"
-  default = false
+  default     = false
 }
 
 variable "idle_client_timeout" {
   description = "Idle client timeout of the RDS proxy (keep connection alive)"
-  default = 1800
+  default     = 1800
 }
 
 variable "proxy_require_tls" {
   description = "Require tls on the RDS proxy. Default: true"
-  type = bool
-  default = true
+  type        = bool
+  default     = true
 }
 
 variable "proxy_name" {
   description = "Name of the RDS proxy. Will be auto-generated if not specified"
-  type = string
-  default = null
+  type        = string
+  default     = null
 }
 
 variable "proxy_engine_family" {
   description = "Engine family of the RDS proxy. Default: POSTGRESQL"
-  type = string
-  default = "POSTGRESQL"
+  type        = string
+  default     = "POSTGRESQL"
 }
 
 # get inspiration from https://dev.azure.com/dfds/Phoenix/_git/aws-modules-rds?path=/variables.tf&version=GBmaster
 
 variable "vpc_id" { # TODO: include?
-  type = string
+  type    = string
   default = null
 }
 variable "rds_proxy_security_group_ids" { # TODO: remove
-  type        = list(string)
-  default     = []
+  type    = list(string)
+  default = []
 }
 
 
 variable "is_serverless" { # tempprary variable for testing
-  type = bool
+  type    = bool
   default = false
 }

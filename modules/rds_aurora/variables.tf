@@ -311,7 +311,7 @@ variable "instances" {
 }
 
 variable "cluster_db_instance_count" {
-  type = number
+  type    = number
   default = 0
 }
 

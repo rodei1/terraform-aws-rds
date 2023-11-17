@@ -6,8 +6,8 @@ data "aws_caller_identity" "current" {}
 data "aws_availability_zones" "available" {}
 
 locals {
-  name    = "postgresql-serverless"
-  region  = "eu-central-1"
+  name   = "postgresql-serverless"
+  region = "eu-central-1"
 
   vpc_cidr = "10.20.0.0/16"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
@@ -21,22 +21,22 @@ locals {
 
 
 module "rds_cluster_test" {
-  source = "../../"
-  identifier                     = local.name
+  source     = "../../"
+  identifier = local.name
 
-#   is_db_cluster = true
-  is_serverless = true
+  #   is_db_cluster = true
+  is_serverless             = true
   cluster_db_instance_count = 0
-  username = "cluster_user"
-  vpc_security_group_ids = [module.security_group.security_group_id]
-  ca_cert_identifier = "rds-ca-ecc384-g1"
-  apply_immediately = true
-  tags = local.tags
+  username                  = "cluster_user"
+  vpc_security_group_ids    = [module.security_group.security_group_id]
+  ca_cert_identifier        = "rds-ca-ecc384-g1"
+  apply_immediately         = true
+  tags                      = local.tags
 
 
   publicly_accessible = true
 
-  subnet_ids = concat(module.vpc.public_subnets)
+  subnet_ids        = concat(module.vpc.public_subnets)
   allocated_storage = 100
 
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
@@ -61,9 +61,9 @@ module "vpc" {
   name = local.name
   cidr = local.vpc_cidr
 
-  azs              = local.azs
-  public_subnets   = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
-  private_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 3)]
+  azs             = local.azs
+  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
+  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 3)]
   # database_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 6)]
 
   # create_database_subnet_group = true
@@ -101,25 +101,25 @@ module "security_group" { # update with another rule for public access
 
 resource "aws_security_group" "rds_proxy_sg" { # TODO: add conditional to only create when proxy is enabled
 
-  name = "rds-proxy-${local.name}"
+  name        = "rds-proxy-${local.name}"
   description = "A security group for ${local.name} database proxy"
-  vpc_id = module.vpc.vpc_id
+  vpc_id      = module.vpc.vpc_id
 
   tags = local.tags
 
   # Proxy requires self referencing inbound rule
   ingress {
     from_port = 5432
-    to_port = 5432
-    protocol = "tcp"
-    self = true
+    to_port   = 5432
+    protocol  = "tcp"
+    self      = true
   }
 
   # Allow outbound all traffic
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }

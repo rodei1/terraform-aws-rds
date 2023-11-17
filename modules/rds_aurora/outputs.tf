@@ -67,7 +67,7 @@ output "cluster_master_user_secret" {
 
 output "cluster_master_user_secret_arn" {
   description = "The ARN of the master user secret (Only available when manage_master_user_password is set to true)"
-  value      = try(aws_rds_cluster.this.master_user_secret[0].secret_arn, null)
+  value       = try(aws_rds_cluster.this.master_user_secret[0].secret_arn, null)
 }
 
 output "cluster_hosted_zone_id" {

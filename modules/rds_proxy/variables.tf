@@ -161,8 +161,8 @@ variable "log_group_tags" {
 
 variable "cloudwatch_log_group_skip_destroy_on_deletion" {
   description = "value to skip destroy ClouwWatch log group on deletion"
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 ################################################################################
