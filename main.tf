@@ -45,7 +45,7 @@ locals {
   create_monitoring_role = var.monitoring_interval > 0
   monitoring_role_name = local.create_monitoring_role && var.monitoring_role_name == null ? "${var.identifier}-rds-enhanced-monitoring" : var.monitoring_role_name
   monitoring_role_description = var.create_monitoring_role && var.monitoring_role_description == null ? "Role for enhanced monitoring of RDS instance ${var.identifier}" : var.monitoring_role_description
-
+  monitoring_role_arn     = try(module.enhanced_monitoring_iam_role[0].enhanced_monitoring_iam_role_arn, null)
   ########################################################################
   # CloudWatch log group config
   ########################################################################
@@ -194,7 +194,7 @@ module "db_instance" {
   backup_window                        = var.backup_window
   max_allocated_storage                = var.max_allocated_storage
   monitoring_interval                  = var.monitoring_interval
-  monitoring_role_arn                  = module.enhanced_monitoring_iam_role[0].enhanced_monitoring_iam_role_arn
+  monitoring_role_arn                  = local.monitoring_role_arn
 
   character_set_name       = var.character_set_name
   nchar_character_set_name = var.nchar_character_set_name
@@ -273,8 +273,8 @@ module "db_cluster_serverless" {
 
   vpc_security_group_ids = var.vpc_security_group_ids
 
-  monitoring_interval = 60
-  monitoring_role_arn                  = module.enhanced_monitoring_iam_role[0].enhanced_monitoring_iam_role_arn
+  monitoring_interval       = var.monitoring_interval
+  monitoring_role_arn       = local.monitoring_role_arn
 
   apply_immediately   = true
   skip_final_snapshot = true
