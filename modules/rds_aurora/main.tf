@@ -101,7 +101,7 @@ resource "aws_rds_cluster" "this" {
   storage_encrypted      = var.storage_encrypted
   storage_type           = var.storage_type
   tags                   = merge(var.tags, var.cluster_tags)
-  vpc_security_group_ids =var.vpc_security_group_ids # compact(concat([try(aws_security_group.this[0].id, "")], var.vpc_security_group_ids))
+  vpc_security_group_ids = var.vpc_security_group_ids # compact(concat([try(aws_security_group.this[0].id, "")], var.vpc_security_group_ids))
 
   timeouts {
     create = try(var.cluster_timeouts.create, null)
@@ -221,7 +221,7 @@ resource "aws_rds_cluster_endpoint" "this" {
 ################################################################################
 
 resource "aws_rds_cluster_role_association" "this" {
-  for_each = { for k, v in var.iam_roles : k => v}
+  for_each = { for k, v in var.iam_roles : k => v }
 
   db_cluster_identifier = aws_rds_cluster.this.id
   feature_name          = each.value.feature_name
