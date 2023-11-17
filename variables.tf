@@ -133,7 +133,6 @@ variable "final_snapshot_identifier_prefix" {
 variable "instance_class" {
   description = "The instance type of the RDS instance"
   type        = string
-  default     = null
 }
 
 variable "db_name" {
@@ -376,7 +375,6 @@ variable "db_subnet_group_description" {
 variable "subnet_ids" {
   description = "A list of VPC subnet IDs"
   type        = list(string)
-  default     = []
 }
 
 # DB parameter group
