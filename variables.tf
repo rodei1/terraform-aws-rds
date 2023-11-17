@@ -92,15 +92,17 @@ variable "domain_iam_role_name" {
 variable "engine" {
   description = "The database engine to use"
   type        = string
-  #   default     = null
-  default = "postgres"
+  default     = "postgres"
+  validation {
+    condition     = contains(["aurora-postgresql", "postgres"], var.engine)
+    error_message = "Invalid value for var.engine. Supported values: aurora-postgresql, postgres."
+  }
 }
 
 variable "engine_version" {
   description = "The engine version to use"
   type        = string
-  #   default     = null
-  default = "14.9"
+  default     = "14.9"
 }
 
 variable "skip_final_snapshot" {
@@ -828,6 +830,10 @@ variable "proxy_engine_family" {
   description = "Engine family of the RDS proxy. Default: POSTGRESQL"
   type        = string
   default     = "POSTGRESQL"
+  validation {
+    condition     = contains(["POSTGRESQL"], var.proxy_engine_family)
+    error_message = "Invalid value for var.proxy_engine_family. Supported value: POSTGRESQL."
+  }
 }
 
 # get inspiration from https://dev.azure.com/dfds/Phoenix/_git/aws-modules-rds?path=/variables.tf&version=GBmaster
