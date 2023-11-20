@@ -99,11 +99,11 @@ variable "engine" {
   }
 }
 
-variable "engine_version" {
-  description = "The engine version to use"
-  type        = string
-  default     = "14.9"
-}
+# variable "engine_version" {
+#   description = "The engine version to use"
+#   type        = string
+#   default     = "14.9"
+# }
 
 variable "skip_final_snapshot" {
   description = "Determines whether a final DB snapshot is created before the DB instance is deleted. If true is specified, no DBSnapshot is created. If false is specified, a DB snapshot is created before the DB instance is deleted"
@@ -258,7 +258,7 @@ variable "monitoring_iam_role_path" {
   default     = null
 }
 
-variable "allow_major_version_upgrade" {
+variable "allow_major_version_upgrade" { # keep or remove or set default ?
   description = "Indicates that major version upgrades are allowed. Changing this parameter does not result in an outage and the change is asynchronously applied as soon as possible"
   type        = bool
   default     = false
@@ -390,7 +390,7 @@ variable "parameter_group_name" {
   default     = null
 }
 
-variable "parameter_group_use_name_prefix" {
+variable "parameter_group_use_name_prefix" { # It is good to have default value as true in case of upgrades as it results in new parameter group to be created with new engine version
   description = "Determines whether to use `parameter_group_name` as is or create a unique name beginning with the `parameter_group_name` as the prefix"
   type        = bool
   default     = true
@@ -408,13 +408,13 @@ variable "parameter_group_family" {
   default     = null # varies depending on engine and version and instance type
 }
 
-variable "family" { # TODO: Remove
-  description = "The family of the DB parameter group"
-  type        = string
-  default     = null # varies depending on engine and version and instance type
-}
+# variable "family" { # TODO: Remove
+#   description = "The family of the DB parameter group"
+#   type        = string
+#   default     = null # varies depending on engine and version and instance type
+# }
 
-variable "parameters" {
+variable "instance_parameters" {
   description = "A list of DB parameters (map) to apply"
   type        = list(map(string))
   default     = []
@@ -483,12 +483,6 @@ variable "nchar_character_set_name" {
   default     = null
 }
 
-variable "enabled_cloudwatch_logs_exports" {
-  description = "List of log types to enable for exporting to CloudWatch logs. If omitted, no logs will be exported. Valid values (depending on engine): alert, audit, error, general, listener, slowquery, trace, postgresql (PostgreSQL), upgrade (PostgreSQL)"
-  type        = list(string)
-  default     = []
-}
-
 variable "timeouts" {
   description = "Updated Terraform resource management timeouts. Applies to `aws_db_instance` in particular to permit resource management times"
   type        = map(string)
@@ -553,10 +547,10 @@ variable "network_type" {
 # CloudWatch Log Group
 ################################################################################
 
-variable "create_cloudwatch_log_group" { ## TODO: Do we need this?
-  description = "Determines whether a CloudWatch log group is created for each `enabled_cloudwatch_logs_exports`"
-  type        = bool
-  default     = false
+variable "enabled_cloudwatch_logs_exports" {
+  description = "List of log types to enable for exporting to CloudWatch logs. If omitted, no logs will be exported. Valid values (depending on engine): alert, audit, error, general, listener, slowquery, trace, postgresql (PostgreSQL), upgrade (PostgreSQL)"
+  type        = list(string)
+  default     = []
 }
 
 variable "cloudwatch_log_group_retention_in_days" {
@@ -704,6 +698,11 @@ variable "cluster_iam_roles" { # ? custom_iam_instance_profile ??
   default     = {}
 }
 
+variable "cluster_parameters" {
+  description = "A list of DB parameters (map) to apply"
+  type        = list(map(string))
+  default     = []
+}
 
 ################################################################################
 # Cluster Autoscaling

@@ -36,11 +36,11 @@ module "rds_instance_test" {
 
   publicly_accessible = true
 
-
   subnet_ids        = concat(module.vpc.public_subnets)
   allocated_storage = 100
 
-  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+  enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
+  cloudwatch_log_group_retention_in_days = 1
 
   rds_proxy_security_group_ids = [aws_security_group.rds_proxy_sg.id]
 
@@ -48,6 +48,9 @@ module "rds_instance_test" {
   proxy_debug_logging = true
 
   monitoring_interval = 60
+
+  allow_major_version_upgrade = true # default ?
+  major_engine_version        = 16
 
 }
 

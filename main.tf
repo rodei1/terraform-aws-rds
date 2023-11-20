@@ -10,28 +10,21 @@ locals {
   create_db_parameter_group = true
   # parameter_group_name_id = local.create_db_parameter_group ? module.db_parameter_group.db_parameter_group_id : var.parameter_group_name
   pramater_group_family = local.create_db_parameter_group && var.parameter_group_family == null ? "${var.engine}${var.major_engine_version}" : var.parameter_group_family
-  parameters = [
-    # {
-    # name         = "log_min_duration_statement"
-    # value        = 4000
-    # apply_method = "immediate"
-    # },
+  instance_parameters = concat([
     {
-      name         = "log_statement"
-      value        = "all"
-      apply_method = "immediate"
-    },
+      "name"         = "rds.force_ssl"
+      "value"        = 1
+      "apply_method" = "immediate"
+    }]
+  , var.instance_parameters)
+
+  cluster_parameters = concat([
     {
-      name         = "log_min_duration_statement" # maybe this is not relevant or maybe it is
-      value        = 5
+      name         = "rds.force_ssl"
+      value        = 1
       apply_method = "immediate"
     }
-    #   , {
-    #   name         = "rds.force_ssl"
-    #   value        = 1
-    #   apply_method = "immediate"
-    # }
-  ]
+  ], var.cluster_parameters)
 
   ########################################################################
   # Subnet group
@@ -79,6 +72,8 @@ locals {
   is_serverless = var.is_serverless # temporary controlled by variable. TODO: Replace by calculation
 
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.final_snapshot_identifier_prefix}-${var.identifier}-${try(random_id.snapshot_identifier[0].hex, "")}"
+
+  engine_version = var.major_engine_version
 }
 
 resource "random_id" "snapshot_identifier" {
@@ -97,10 +92,10 @@ module "db_parameter_group" {
   source          = "./modules/instance_parameter_group"
   count           = local.create_db_parameter_group ? 1 : 0
   name            = var.identifier
-  use_name_prefix = false #var.parameter_group_use_name_prefix
+  use_name_prefix = var.parameter_group_use_name_prefix
   description     = var.parameter_group_description
   family          = local.pramater_group_family
-  parameters      = local.parameters
+  parameters      = local.instance_parameters
   tags            = merge(var.tags, var.db_parameter_group_tags) # additional tagging for parameter group?
 }
 
@@ -141,7 +136,7 @@ module "db_instance" {
   identifier            = var.identifier
   use_identifier_prefix = var.instance_use_identifier_prefix
   engine                = var.engine
-  engine_version        = var.engine_version
+  engine_version        = local.engine_version
   instance_class        = var.instance_class
   allocated_storage     = local.storage_size
   storage_type          = local.storage_type
@@ -208,7 +203,11 @@ module "db_instance" {
   restore_to_point_in_time = var.restore_to_point_in_time
   s3_import                = var.s3_import
 
+
+  enabled_cloudwatch_logs_exports = var.enabled_cloudwatch_logs_exports
+
   tags = merge(var.tags, var.db_instance_tags)
+
 }
 
 module "cluster_parameters" {
@@ -218,13 +217,7 @@ module "cluster_parameters" {
   db_cluster_parameter_group_name        = var.identifier
   db_cluster_parameter_group_family      = local.pramater_group_family
   db_cluster_parameter_group_description = "${var.identifier} DB parameter cluster group"
-  db_cluster_parameter_group_parameters = [
-    {
-      name         = "rds.force_ssl"
-      value        = 1
-      apply_method = "immediate"
-    }
-  ]
+  db_cluster_parameter_group_parameters  = local.cluster_parameters
 }
 
 module "db_multi_az_cluster" {
@@ -233,7 +226,7 @@ module "db_multi_az_cluster" {
   name                    = var.identifier
   cluster_use_name_prefix = var.cluster_use_name_prefix
   engine                  = var.engine
-  engine_version          = var.engine_version
+  engine_version          = local.engine_version
 
   db_subnet_group_name = local.db_subnet_group_name
 
@@ -254,6 +247,10 @@ module "db_multi_az_cluster" {
   vpc_security_group_ids = var.vpc_security_group_ids
 
   skip_final_snapshot = var.skip_final_snapshot
+
+  enabled_cloudwatch_logs_exports = var.enabled_cloudwatch_logs_exports
+
+  tags = merge(var.tags, var.db_instance_tags)
 
 }
 
@@ -292,8 +289,6 @@ module "db_cluster_serverless" {
 
   tags = var.tags
 }
-
-
 
 
 
