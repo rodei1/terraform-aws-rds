@@ -209,50 +209,50 @@ variable "publicly_accessible" {
   default     = false
 }
 
-variable "monitoring_interval" {
+variable "enhanced_monitoring_interval" {
   description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60"
   type        = number
   default     = 0
 }
 
-variable "monitoring_role_arn" {
+variable "enhanced_monitoring_role_arn" {
   description = "The ARN for the IAM role that permits RDS to send enhanced monitoring metrics to CloudWatch Logs. Must be specified if monitoring_interval is non-zero"
   type        = string
   default     = null
 }
 
-variable "monitoring_role_name" {
+variable "enhanced_monitoring_role_name" {
   description = "Name of the IAM role which will be created when create_monitoring_role is enabled"
   type        = string
   # default     = "rds-monitoring-role"
   default = null
 }
 
-variable "monitoring_role_use_name_prefix" {
+variable "enhanced_monitoring_role_use_name_prefix" {
   description = "Determines whether to use `monitoring_role_name` as is or create a unique identifier beginning with `monitoring_role_name` as the specified prefix"
   type        = bool
   default     = false
 }
 
-variable "monitoring_role_description" {
+variable "enhanced_monitoring_role_description" {
   description = "Description of the monitoring IAM role"
   type        = string
   default     = null
 }
 
-variable "create_monitoring_role" {
+variable "enhanced_monitoring_create_role" {
   description = "Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs"
   type        = bool
   default     = false
 }
 
-variable "monitoring_role_permissions_boundary" {
+variable "enhanced_monitoring_role_permissions_boundary" {
   description = "ARN of the policy that is used to set the permissions boundary for the monitoring IAM role"
   type        = string
   default     = null
 }
 
-variable "monitoring_iam_role_path" {
+variable "enhanced_monitoring_iam_role_path" {
   description = "Path for the monitoring role"
   type        = string
   default     = null
