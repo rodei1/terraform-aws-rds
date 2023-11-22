@@ -280,10 +280,10 @@ variable "maintenance_window" {
   description = "The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00'"
   type        = string
   #   default     = null
-  default = "Sat:21:00-Sun:01:00" # This is adjusted in accordance with AWS Backup schedule, see info here: https://wiki.dfds.cloud/en/playbooks/aws-backup/aws-backup-getting-started
+  default = "Sat:18:00-Sat:20:00" # This is adjusted in accordance with AWS Backup schedule, see info here: https://wiki.dfds.cloud/en/playbooks/aws-backup/aws-backup-getting-started
 }
-# Continuous backup takes place between 1 and 5 AM UTC.
-# Snapshot backups take place between 3 and 7 AM UTC.
+# Continuous backup takes place between 8 PM and 5 AM UTC.
+# Snapshot backups take place between 3 AM and 7 AM UTC.
 
 variable "blue_green_update" {
   description = "Enables low-downtime updates using RDS Blue/Green deployments."
