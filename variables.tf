@@ -839,11 +839,20 @@ variable "vpc_id" { # TODO: include?
   type    = string
   default = null
 }
+
 variable "rds_proxy_security_group_ids" { # TODO: remove
   type    = list(string)
   default = []
 }
 
+variable "rds_proxy_iam_auth" {
+  type    = string
+  default = "DISABLED"
+  validation {
+    condition     = contains(["DISABLED", "REQUIRED"], var.rds_proxy_iam_auth)
+    error_message = "Invalid value for var.rds_proxy_iam_auth. Supported values: DISABLED, REQUIRED."
+  }
+}
 
 variable "is_serverless" { # tempprary variable for testing
   type    = bool
