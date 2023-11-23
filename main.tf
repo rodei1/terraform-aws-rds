@@ -55,6 +55,7 @@ locals {
     (var.username) = {
       description = "Proxy user for ${var.username}"
       secret_arn  = local.db_proxy_secret_arn # aws_secretsmanager_secret.superuser.arn
+      iam_auth = var.rds_proxy_iam_auth
     }
   }
 
