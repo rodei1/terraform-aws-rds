@@ -153,6 +153,7 @@ Terraform module for AWS RDS instances
 | <a name="input_proxy_name"></a> [proxy\_name](#input\_proxy\_name) | Name of the RDS proxy. Will be auto-generated if not specified | `string` | `null` | no |
 | <a name="input_proxy_require_tls"></a> [proxy\_require\_tls](#input\_proxy\_require\_tls) | Require tls on the RDS proxy. Default: true | `bool` | `true` | no |
 | <a name="input_publicly_accessible"></a> [publicly\_accessible](#input\_publicly\_accessible) | Bool to control if instance is publicly accessible | `bool` | `false` | no |
+| <a name="input_rds_proxy_iam_auth"></a> [rds\_proxy\_iam\_auth](#input\_rds\_proxy\_iam\_auth) | n/a | `string` | `"DISABLED"` | no |
 | <a name="input_rds_proxy_security_group_ids"></a> [rds\_proxy\_security\_group\_ids](#input\_rds\_proxy\_security\_group\_ids) | n/a | `list(string)` | `[]` | no |
 | <a name="input_replica_mode"></a> [replica\_mode](#input\_replica\_mode) | Specifies whether the replica is in either mounted or open-read-only mode. This attribute is only supported by Oracle instances. Oracle replicas operate in open-read-only mode unless otherwise specified | `string` | `null` | no |
 | <a name="input_replicate_source_db"></a> [replicate\_source\_db](#input\_replicate\_source\_db) | Specifies that this resource is a Replicate database, and to use this value as the source database. This correlates to the identifier of another Amazon RDS Database to replicate | `string` | `null` | no |
