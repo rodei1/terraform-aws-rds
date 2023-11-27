@@ -29,6 +29,7 @@ Terraform module for AWS RDS instances
 | <a name="module_db_proxy"></a> [db\_proxy](#module\_db\_proxy) | ./modules/rds_proxy | n/a |
 | <a name="module_db_subnet_group"></a> [db\_subnet\_group](#module\_db\_subnet\_group) | ./modules/rds_subnet_group | n/a |
 | <a name="module_enhanced_monitoring_iam_role"></a> [enhanced\_monitoring\_iam\_role](#module\_enhanced\_monitoring\_iam\_role) | ./modules/enhanced_monitoring_role | n/a |
+| <a name="module_security_group"></a> [security\_group](#module\_security\_group) | ./modules/security_group | n/a |
 
 ## Resources
 
@@ -155,6 +156,7 @@ Terraform module for AWS RDS instances
 | <a name="input_publicly_accessible"></a> [publicly\_accessible](#input\_publicly\_accessible) | Bool to control if instance is publicly accessible | `bool` | `false` | no |
 | <a name="input_rds_proxy_iam_auth"></a> [rds\_proxy\_iam\_auth](#input\_rds\_proxy\_iam\_auth) | n/a | `string` | `"DISABLED"` | no |
 | <a name="input_rds_proxy_security_group_ids"></a> [rds\_proxy\_security\_group\_ids](#input\_rds\_proxy\_security\_group\_ids) | n/a | `list(string)` | `[]` | no |
+| <a name="input_rds_security_group_rules"></a> [rds\_security\_group\_rules](#input\_rds\_security\_group\_rules) | n/a | <pre>object({<br>    ingress_rules     = list(any)<br>    ingress_with_self = list(any)<br>  })</pre> | n/a | yes |
 | <a name="input_replica_mode"></a> [replica\_mode](#input\_replica\_mode) | Specifies whether the replica is in either mounted or open-read-only mode. This attribute is only supported by Oracle instances. Oracle replicas operate in open-read-only mode unless otherwise specified | `string` | `null` | no |
 | <a name="input_replicate_source_db"></a> [replicate\_source\_db](#input\_replicate\_source\_db) | Specifies that this resource is a Replicate database, and to use this value as the source database. This correlates to the identifier of another Amazon RDS Database to replicate | `string` | `null` | no |
 | <a name="input_restore_to_point_in_time"></a> [restore\_to\_point\_in\_time](#input\_restore\_to\_point\_in\_time) | Restore to a point in time (MySQL is NOT supported) | `map(string)` | `null` | no |
@@ -169,7 +171,7 @@ Terraform module for AWS RDS instances
 | <a name="input_timeouts"></a> [timeouts](#input\_timeouts) | Updated Terraform resource management timeouts. Applies to `aws_db_instance` in particular to permit resource management times | `map(string)` | `{}` | no |
 | <a name="input_timezone"></a> [timezone](#input\_timezone) | Time zone of the DB instance. timezone is currently only supported by Microsoft SQL Server. The timezone can only be set on creation. See MSSQL User Guide for more information | `string` | `null` | no |
 | <a name="input_username"></a> [username](#input\_username) | Username for the master DB user | `string` | `null` | no |
-| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | n/a | `string` | `null` | no |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | } | `string` | `null` | no |
 | <a name="input_vpc_security_group_ids"></a> [vpc\_security\_group\_ids](#input\_vpc\_security\_group\_ids) | List of VPC security groups to associate | `list(string)` | `[]` | no |
 
 ## Outputs

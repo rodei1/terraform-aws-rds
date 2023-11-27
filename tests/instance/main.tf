@@ -24,13 +24,13 @@ module "rds_instance_test" {
   source     = "../../"
   identifier = local.name
 
-  instance_class         = "db.t3.micro"
-  multi_az               = true
-  username               = "instance_user"
-  vpc_security_group_ids = [module.security_group.security_group_id]
-  ca_cert_identifier     = "rds-ca-ecc384-g1"
-  apply_immediately      = true
-  tags                   = local.tags
+  instance_class = "db.t3.micro"
+  multi_az       = true
+  username       = "instance_user"
+  # vpc_security_group_ids = [module.security_group.security_group_id]
+  ca_cert_identifier = "rds-ca-ecc384-g1"
+  apply_immediately  = true
+  tags               = local.tags
 
 
   publicly_accessible = true
@@ -46,10 +46,33 @@ module "rds_instance_test" {
   include_proxy       = true
   proxy_debug_logging = true
 
-  enhanced_monitoring_interval = 60
+  enhanced_monitoring_interval = 0
 
   allow_major_version_upgrade = true # default ?
   major_engine_version        = 16
+
+  performance_insights_enabled = true
+
+  # Group variables into maps
+  vpc_id = module.vpc.vpc_id
+  rds_security_group_rules = {
+    ingress_rules = [
+      {
+        from_port   = 5432
+        to_port     = 5432
+        protocol    = "tcp"
+        description = "PostgreSQL access from within VPC"
+        cidr_blocks = module.vpc.vpc_cidr_block
+      },
+      {
+        from_port   = 5432
+        to_port     = 5432
+        protocol    = "tcp"
+        description = "PostgreSQL access from internet"
+        cidr_blocks = "0.0.0.0/0"
+      },
+    ]
+  }
 
 }
 
@@ -72,33 +95,6 @@ module "vpc" {
   # database_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 6)]
 
   # create_database_subnet_group = true
-
-  tags = local.tags
-}
-
-module "security_group" { # update with another rule for public access
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 5.0"
-
-  name        = local.name
-  description = "Complete PostgreSQL example security group"
-  vpc_id      = module.vpc.vpc_id
-
-  # ingress
-  ingress_with_cidr_blocks = [
-    {
-      from_port   = 5432
-      to_port     = 5432
-      protocol    = "tcp"
-      description = "PostgreSQL access from within VPC"
-      cidr_blocks = module.vpc.vpc_cidr_block
-    },
-    {
-      rule        = "postgresql-tcp"
-      cidr_blocks = "0.0.0.0/0"
-      description = "PostgreSQL access from internet"
-    },
-  ]
 
   tags = local.tags
 }

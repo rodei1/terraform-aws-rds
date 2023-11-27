@@ -835,11 +835,6 @@ variable "proxy_engine_family" {
 
 # get inspiration from https://dev.azure.com/dfds/Phoenix/_git/aws-modules-rds?path=/variables.tf&version=GBmaster
 
-variable "vpc_id" { # TODO: include?
-  type    = string
-  default = null
-}
-
 variable "rds_proxy_security_group_ids" { # TODO: remove
   type    = list(string)
   default = []
@@ -857,4 +852,25 @@ variable "rds_proxy_iam_auth" {
 variable "is_serverless" { # tempprary variable for testing
   type    = bool
   default = false
+}
+
+
+
+
+################################################################################
+# Security Group
+################################################################################
+# variable "vpc_cidr_block" {
+
+# }
+variable "vpc_id" { # TODO: include?
+  type    = string
+  default = null
+}
+
+variable "rds_security_group_rules" {
+  type = object({
+    ingress_rules     = list(any)
+    ingress_with_self = list(any)
+  })
 }

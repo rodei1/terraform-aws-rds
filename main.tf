@@ -55,7 +55,7 @@ locals {
     (var.username) = {
       description = "Proxy user for ${var.username}"
       secret_arn  = local.db_proxy_secret_arn # aws_secretsmanager_secret.superuser.arn
-      iam_auth = var.rds_proxy_iam_auth
+      iam_auth    = var.rds_proxy_iam_auth
     }
   }
 
@@ -75,6 +75,7 @@ locals {
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.final_snapshot_identifier_prefix}-${var.identifier}-${try(random_id.snapshot_identifier[0].hex, "")}"
 
   engine_version = var.major_engine_version
+
 }
 
 resource "random_id" "snapshot_identifier" {
@@ -156,7 +157,7 @@ module "db_instance" {
   manage_master_user_password         = var.manage_master_user_password
   master_user_secret_kms_key_id       = var.master_user_secret_kms_key_id
 
-  vpc_security_group_ids = var.vpc_security_group_ids
+  vpc_security_group_ids = [module.security_group.security_group_id] #var.vpc_security_group_ids
   db_subnet_group_name   = local.db_subnet_group_name
   parameter_group_name   = module.db_parameter_group[0].db_parameter_group_id
   option_group_name      = null # var.engine != "postgres" ? local.option_group : null
@@ -340,4 +341,14 @@ module "db_proxy" { # What is endpoints? specifc endpoints for read and or write
   # depends_on = [ module.cluster, module.db  ]
 }
 
-# Defaults
+module "security_group" { # update with another rule for public access
+  source = "./modules/security_group"
+
+  name        = var.identifier
+  description = "RDS PostgreSQL security group"
+  vpc_id      = var.vpc_id
+
+  ingress_with_cidr_blocks = var.rds_security_group_rules.ingress_rules
+  ingress_with_self        = var.rds_security_group_rules.ingress_with_self
+  tags                     = var.tags
+}
