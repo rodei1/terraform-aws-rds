@@ -359,3 +359,15 @@ variable "network_type" {
   type        = string
   default     = null
 }
+
+variable "oidc_provider" {
+  description = "The OIDC provider used for IAM Role for ServiceAccount authentication from Kubernetes"
+  type        = string
+  default     = null
+}
+
+variable "kubernetes_namespace" {
+  description = "The namespace used for IAM Role for ServiceAccount authentication from Kubernetes"
+  type        = string
+  default     = null
+}

@@ -98,3 +98,13 @@ output "db_instance_master_user_secret_arn" {
   description = "The ARN of the master user secret (Only available when manage_master_user_password is set to true)"
   value       = try(aws_db_instance.this.master_user_secret[0].secret_arn, null)
 }
+
+output "iam_role_for_kubernetes_serviceaccounts" {
+  description = "The ARN of the IAM Role that gives Kubernetes service accounts access to AWS"
+  value       = try(aws_iam_role.access_from_kubernetes, null)
+}
+
+output "iam_role_for_aws_services" {
+  description = "The ARN of the IAM Role that give AWS services access to the RDS instance and Secrets Manager"
+  value       = try(aws_iam_role.access_from_aws, null)
+}

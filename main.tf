@@ -208,6 +208,9 @@ module "db_instance" {
 
   enabled_cloudwatch_logs_exports = var.enabled_cloudwatch_logs_exports
 
+  oidc_provider        = var.oidc_provider
+  kubernetes_namespace = var.kubernetes_namespace
+
   tags = merge(var.tags, var.db_instance_tags)
 
 }

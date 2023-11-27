@@ -855,8 +855,6 @@ variable "is_serverless" { # tempprary variable for testing
 }
 
 
-
-
 ################################################################################
 # Security Group
 ################################################################################
@@ -873,4 +871,21 @@ variable "rds_security_group_rules" {
     ingress_rules     = list(any)
     ingress_with_self = list(any)
   })
+}
+
+
+# ################################################################################
+# # IAM Roles for ServiceAccounts (IRSA) - only applicable from Kubernetes pods
+# ################################################################################
+
+variable "oidc_provider" {
+  description = "The OIDC provider used for IAM Role for ServiceAccount authentication from Kubernetes"
+  type        = string
+  default     = null
+}
+
+variable "kubernetes_namespace" {
+  description = "The namespace used for IAM Role for ServiceAccount authentication from Kubernetes"
+  type        = string
+  default     = null
 }
