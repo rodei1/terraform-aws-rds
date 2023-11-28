@@ -101,10 +101,15 @@ output "db_instance_master_user_secret_arn" {
 
 output "iam_role_for_kubernetes_serviceaccounts" {
   description = "The ARN of the IAM Role that gives Kubernetes service accounts access to AWS"
-  value       = try(aws_iam_role.access_from_kubernetes, null)
+  value       = try(aws_iam_role.access_from_kubernetes[0], null)
 }
 
 output "iam_role_for_aws_services" {
   description = "The ARN of the IAM Role that give AWS services access to the RDS instance and Secrets Manager"
   value       = try(aws_iam_role.access_from_aws, null)
+}
+
+output "iam_instance_profile_for_ec2" {
+  description = "The name of the EC2 instance profile to use to access RDS"
+  value       = try(aws_iam_instance_profile.ec2.name, null)
 }
