@@ -300,7 +300,6 @@ module "db_cluster_serverless" {
 module "db_proxy" { # What is endpoints? specifc endpoints for read and or writes?
   source = "./modules/rds_proxy"
   count  = var.include_proxy ? 1 : 0
-
   tags                = var.tags
   name                = var.identifier # "proxy" default is identifier-proxy
   auth                = local.proxy_auth_config
@@ -308,7 +307,7 @@ module "db_proxy" { # What is endpoints? specifc endpoints for read and or write
   engine_family       = var.proxy_engine_family
   idle_client_timeout = var.idle_client_timeout
   require_tls         = var.proxy_require_tls
-  # role_arn =
+  role_arn            = try(module.db_instance[0].iam_role_for_aws_services.arn, null)
   vpc_security_group_ids                        = var.rds_proxy_security_group_ids
   vpc_subnet_ids                                = var.subnet_ids # maybe dedicated subnets for proxy?
   proxy_tags                                    = var.tags
@@ -327,20 +326,6 @@ module "db_proxy" { # What is endpoints? specifc endpoints for read and or write
   log_group_retention_in_days                   = var.cloudwatch_log_group_retention_in_days
   log_group_kms_key_id                          = var.cloudwatch_log_group_kms_key_id
   log_group_tags                                = var.tags
-  create_iam_role                               = true
-  # iam_role_name
-  # use_role_name_prefix
-  # iam_role_description
-  # iam_role_path
-  # iam_role_force_detach_policies
-  # iam_role_max_session_duration
-  # iam_role_permissions_boundary
-  # iam_role_tags
-  # create_iam_policy
-  # iam_policy_name
-  # use_policy_name_prefix
-  # kms_key_arns
-
   # depends_on = [ module.cluster, module.db  ]
 }
 
