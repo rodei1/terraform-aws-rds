@@ -871,6 +871,6 @@ variable "vpc_id" { # TODO: include?
 variable "rds_security_group_rules" {
   type = object({
     ingress_rules     = list(any)
-    ingress_with_self = list(any)
+    ingress_with_self = optional(list(any), [])
   })
 }
