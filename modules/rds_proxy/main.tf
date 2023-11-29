@@ -1,12 +1,3 @@
-locals {
-  role_arn    = var.create_iam_role ? aws_iam_role.this[0].arn : var.role_arn
-  role_name   = coalesce(var.iam_role_name, var.name)
-  policy_name = coalesce(var.iam_policy_name, var.name)
-}
-
-data "aws_region" "current" {}
-data "aws_partition" "current" {}
-
 ################################################################################
 # RDS Proxy
 ################################################################################
@@ -30,7 +21,7 @@ resource "aws_db_proxy" "this" {
   idle_client_timeout    = var.idle_client_timeout
   name                   = var.name
   require_tls            = var.require_tls
-  role_arn               = local.role_arn
+  role_arn               = var.role_arn
   vpc_security_group_ids = var.vpc_security_group_ids
   vpc_subnet_ids         = var.vpc_subnet_ids
 
@@ -92,93 +83,4 @@ resource "aws_cloudwatch_log_group" "this" {
 
   tags         = merge(var.tags, var.log_group_tags)
   skip_destroy = var.cloudwatch_log_group_skip_destroy_on_deletion
-}
-
-################################################################################
-# IAM Role
-################################################################################
-
-data "aws_iam_policy_document" "assume_role" {
-  count = var.create_iam_role ? 1 : 0
-
-  statement {
-    sid     = "RDSAssume"
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["rds.${data.aws_partition.current.dns_suffix}"]
-    }
-  }
-}
-
-resource "aws_iam_role" "this" {
-  count = var.create_iam_role ? 1 : 0
-
-  name        = var.use_role_name_prefix ? null : local.role_name
-  name_prefix = var.use_role_name_prefix ? "${local.role_name}-" : null
-  description = var.iam_role_description
-  path        = var.iam_role_path
-
-  assume_role_policy    = data.aws_iam_policy_document.assume_role[0].json
-  force_detach_policies = var.iam_role_force_detach_policies
-  max_session_duration  = var.iam_role_max_session_duration
-  permissions_boundary  = var.iam_role_permissions_boundary
-
-  tags = merge(var.tags, var.iam_role_tags)
-}
-
-data "aws_iam_policy_document" "this" {
-  count = var.create_iam_role && var.create_iam_policy ? 1 : 0
-
-  statement {
-    sid     = "DecryptSecrets"
-    effect  = "Allow"
-    actions = ["kms:Decrypt"]
-    resources = coalescelist(
-      var.kms_key_arns,
-      ["arn:${data.aws_partition.current.partition}:kms:*:*:key/*"]
-    )
-
-    condition {
-      test     = "StringEquals"
-      variable = "kms:ViaService"
-      values = [
-        "secretsmanager.${data.aws_region.current.name}.${data.aws_partition.current.dns_suffix}"
-      ]
-    }
-  }
-
-  statement {
-    sid    = "ListSecrets"
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetRandomPassword",
-      "secretsmanager:ListSecrets",
-    ]
-    resources = ["*"]
-  }
-
-  statement {
-    sid    = "GetSecrets"
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetResourcePolicy",
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret",
-      "secretsmanager:ListSecretVersionIds",
-    ]
-
-    resources = distinct([for auth in var.auth : auth.secret_arn])
-  }
-}
-
-resource "aws_iam_role_policy" "this" {
-  count = var.create_iam_role && var.create_iam_policy ? 1 : 0
-
-  name        = var.use_policy_name_prefix ? null : local.policy_name
-  name_prefix = var.use_policy_name_prefix ? "${local.policy_name}-" : null
-  policy      = data.aws_iam_policy_document.this[0].json
-  role        = aws_iam_role.this[0].id
 }

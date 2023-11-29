@@ -126,6 +126,7 @@ Terraform module for AWS RDS instances
 | <a name="input_is_db_cluster"></a> [is\_db\_cluster](#input\_is\_db\_cluster) | n/a | `bool` | `false` | no |
 | <a name="input_is_serverless"></a> [is\_serverless](#input\_is\_serverless) | n/a | `bool` | `false` | no |
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | The ARN for the KMS encryption key. If creating an encrypted replica, set this to the destination KMS ARN. If storage\_encrypted is set to true and kms\_key\_id is not specified the default KMS key created in your account will be used. Be sure to use the full ARN, not a key alias. | `string` | `null` | no |
+| <a name="input_kubernetes_namespace"></a> [kubernetes\_namespace](#input\_kubernetes\_namespace) | The namespace used for IAM Role for ServiceAccount authentication from Kubernetes | `string` | `null` | no |
 | <a name="input_license_model"></a> [license\_model](#input\_license\_model) | License model information for this DB instance. Optional, but required for some DB engines, i.e. Oracle SE1 | `string` | `null` | no |
 | <a name="input_maintenance_window"></a> [maintenance\_window](#input\_maintenance\_window) | The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00' | `string` | `"Sat:18:00-Sat:20:00"` | no |
 | <a name="input_major_engine_version"></a> [major\_engine\_version](#input\_major\_engine\_version) | Specifies the major version of the engine that this option group should be associated with | `string` | `"14"` | no |
@@ -135,6 +136,7 @@ Terraform module for AWS RDS instances
 | <a name="input_multi_az"></a> [multi\_az](#input\_multi\_az) | Specifies if the RDS instance is multi-AZ | `bool` | `false` | no |
 | <a name="input_nchar_character_set_name"></a> [nchar\_character\_set\_name](#input\_nchar\_character\_set\_name) | The national character set is used in the NCHAR, NVARCHAR2, and NCLOB data types for Oracle instances. This can't be changed. | `string` | `null` | no |
 | <a name="input_network_type"></a> [network\_type](#input\_network\_type) | The type of network stack to use | `string` | `null` | no |
+| <a name="input_oidc_provider"></a> [oidc\_provider](#input\_oidc\_provider) | The OIDC provider used for IAM Role for ServiceAccount authentication from Kubernetes | `string` | `null` | no |
 | <a name="input_option_group_description"></a> [option\_group\_description](#input\_option\_group\_description) | The description of the option group | `string` | `null` | no |
 | <a name="input_option_group_name"></a> [option\_group\_name](#input\_option\_group\_name) | Name of the option group | `string` | `null` | no |
 | <a name="input_option_group_timeouts"></a> [option\_group\_timeouts](#input\_option\_group\_timeouts) | Define maximum timeout for deletion of `aws_db_option_group` resource | `map(string)` | `{}` | no |
@@ -176,5 +178,9 @@ Terraform module for AWS RDS instances
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_iam_instance_profile_for_ec2"></a> [iam\_instance\_profile\_for\_ec2](#output\_iam\_instance\_profile\_for\_ec2) | The name of the EC2 instance profile that is using the IAM Role that give AWS services access to the RDS instance and Secrets Manager |
+| <a name="output_iam_role_arn_for_aws_services"></a> [iam\_role\_arn\_for\_aws\_services](#output\_iam\_role\_arn\_for\_aws\_services) | The ARN of the IAM Role that give AWS services access to the RDS instance and Secrets Manager |
+| <a name="output_kubernetes_serviceaccount"></a> [kubernetes\_serviceaccount](#output\_kubernetes\_serviceaccount) | If you create this Kubernetes ServiceAccount, you will get access to the RDS through IRSA |
 <!-- END_TF_DOCS -->

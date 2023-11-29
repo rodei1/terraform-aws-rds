@@ -152,3 +152,147 @@ resource "aws_db_instance" "this" {
 #   skip_destroy = var.cloudwatch_log_group_skip_destroy_on_deletion
 #   tags = var.tags
 # }
+
+
+# ################################################################################
+# # IAM resources
+# ################################################################################
+
+locals {
+  oidc_provider        = coalesce(var.oidc_provider, "none")
+  kubernetes_namespace = coalesce(var.kubernetes_namespace, "none")
+}
+
+data "aws_region" "current" {}
+
+data "aws_caller_identity" "current" {}
+
+data "aws_iam_policy_document" "connect" {
+  statement {
+    sid       = "Connect"
+    effect    = "Allow"
+    resources = ["arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${aws_db_instance.this.id}/*"]
+    actions   = ["rds-db:connect"]
+  }
+}
+
+data "aws_iam_policy_document" "secretsmanager" {
+  statement {
+    sid       = "DecryptSecrets"
+    effect    = "Allow"
+    resources = ["arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/*"]
+    actions   = ["kms:Decrypt"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["secretsmanager.${data.aws_region.current.name}.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid       = "ListSecrets"
+    effect    = "Allow"
+    resources = ["*"]
+
+    actions = [
+      "secretsmanager:ListSecrets",
+      "secretsmanager:GetRandomPassword",
+    ]
+  }
+
+  statement {
+    sid       = "GetSecrets"
+    effect    = "Allow"
+    resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:rds!db-*"]
+
+    actions = [
+      "secretsmanager:ListSecretVersionIds",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:DescribeSecret",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "kubernetes" {
+  statement {
+    sid     = ""
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    condition {
+      test     = "StringLike"
+      variable = "${local.oidc_provider}:sub"
+      values   = ["system:serviceaccount:${local.kubernetes_namespace}:*"]
+    }
+
+    principals {
+      type        = "Federated"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${local.oidc_provider}"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "services" {
+  statement {
+    sid     = ""
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid     = ""
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["rds.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid     = ""
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_policy" "connect" {
+  name   = "${aws_db_instance.this.identifier}-connect"
+  policy = data.aws_iam_policy_document.connect.json
+}
+
+resource "aws_iam_policy" "secretsmanager" {
+  name   = "${aws_db_instance.this.identifier}-secretsmanager-read"
+  policy = data.aws_iam_policy_document.secretsmanager.json
+}
+
+resource "aws_iam_role" "access_from_kubernetes" {
+  count               = local.kubernetes_namespace == "none" || local.oidc_provider == "none" ? 0 : 1
+  name                = "${aws_db_instance.this.identifier}-for-kubernetes"
+  assume_role_policy  = data.aws_iam_policy_document.kubernetes.json
+  managed_policy_arns = [aws_iam_policy.connect.arn, aws_iam_policy.secretsmanager.arn]
+}
+
+resource "aws_iam_role" "access_from_aws" {
+  name                = "${aws_db_instance.this.identifier}-for-aws-services"
+  assume_role_policy  = data.aws_iam_policy_document.services.json
+  managed_policy_arns = [aws_iam_policy.connect.arn, aws_iam_policy.secretsmanager.arn]
+}
+
+resource "aws_iam_instance_profile" "ec2" {
+  name = "${aws_db_instance.this.identifier}-for-ec2"
+  role = aws_iam_role.access_from_aws.name
+}
