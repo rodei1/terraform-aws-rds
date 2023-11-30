@@ -133,9 +133,13 @@ variable "engine" {
 }
 
 variable "engine_mode" {
-  description = "The database engine mode. Valid values: `global`, `multimaster`, `parallelquery`, `provisioned`, `serverless`. Defaults to: `provisioned`"
   type        = string
   default     = "provisioned"
+  description = "The database engine mode. Valid values: `global`, `multimaster`, `parallelquery`, `provisioned`, `serverless`. Defaults to: `provisioned`"
+  validation {
+    condition     = contains(["global", "multimaster", "parallelquery", "provisioned", "serverless"], var.engine_mode)
+    error_message = "Invalid value for var.engine_mode. Supported values: `global`, `multimaster`, `parallelquery`, `provisioned`, `serverless`."
+  }
 }
 
 variable "engine_version" {

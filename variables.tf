@@ -1,6 +1,5 @@
 # Expose vars for DB instance. Override defaults with sensible values for DFDS context
 
-
 ################################################################################
 # Instance specific variables - applicable to cluster instances as well
 ################################################################################
@@ -133,6 +132,7 @@ variable "final_snapshot_identifier_prefix" {
 variable "instance_class" {
   description = "The instance type of the RDS instance"
   type        = string
+  default     = ""
 }
 
 variable "db_name" {
@@ -144,7 +144,6 @@ variable "db_name" {
 variable "username" {
   description = "Username for the master DB user"
   type        = string
-  default     = null
 }
 
 variable "password" {
@@ -224,8 +223,7 @@ variable "enhanced_monitoring_role_arn" {
 variable "enhanced_monitoring_role_name" {
   description = "Name of the IAM role which will be created when create_monitoring_role is enabled"
   type        = string
-  # default     = "rds-monitoring-role"
-  default = null
+  default     = null
 }
 
 variable "enhanced_monitoring_role_use_name_prefix" {
@@ -258,7 +256,7 @@ variable "enhanced_monitoring_iam_role_path" {
   default     = null
 }
 
-variable "allow_major_version_upgrade" { # keep or remove or set default ?
+variable "allow_major_version_upgrade" {
   description = "Indicates that major version upgrades are allowed. Changing this parameter does not result in an outage and the change is asynchronously applied as soon as possible"
   type        = bool
   default     = false
@@ -279,8 +277,7 @@ variable "apply_immediately" {
 variable "maintenance_window" {
   description = "The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00'"
   type        = string
-  #   default     = null
-  default = "Sat:18:00-Sat:20:00" # This is adjusted in accordance with AWS Backup schedule, see info here: https://wiki.dfds.cloud/en/playbooks/aws-backup/aws-backup-getting-started
+  default     = "Sat:18:00-Sat:20:00" # This is adjusted in accordance with AWS Backup schedule, see info here: https://wiki.dfds.cloud/en/playbooks/aws-backup/aws-backup-getting-started
 }
 # Continuous backup takes place between 8 PM and 5 AM UTC.
 # Snapshot backups take place between 3 AM and 7 AM UTC.
@@ -408,12 +405,6 @@ variable "parameter_group_family" {
   default     = null # varies depending on engine and version and instance type
 }
 
-# variable "family" { # TODO: Remove
-#   description = "The family of the DB parameter group"
-#   type        = string
-#   default     = null # varies depending on engine and version and instance type
-# }
-
 variable "instance_parameters" {
   description = "A list of DB parameters (map) to apply"
   type        = list(map(string))
@@ -445,11 +436,11 @@ variable "option_group_description" {
   default     = null
 }
 
-variable "major_engine_version" {
+variable "major_engine_version" { # TODO: introduce latest as default
   description = "Specifies the major version of the engine that this option group should be associated with"
   type        = string
   # default     = null
-  default = "14"
+  default = "15" # default to latest?
   # All available versions: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html#PostgreSQL.Concepts
 }
 
@@ -528,7 +519,7 @@ variable "max_allocated_storage" {
 variable "ca_cert_identifier" {
   description = "Specifies the identifier of the CA certificate for the DB instance"
   type        = string
-  default     = null # Need to be specified?
+  default     = null
 }
 
 variable "delete_automated_backups" {
@@ -548,15 +539,22 @@ variable "network_type" {
 ################################################################################
 
 variable "enabled_cloudwatch_logs_exports" {
-  description = "List of log types to enable for exporting to CloudWatch logs. If omitted, no logs will be exported. Valid values (depending on engine): alert, audit, error, general, listener, slowquery, trace, postgresql (PostgreSQL), upgrade (PostgreSQL)"
+  description = "List of log types to enable for exporting to CloudWatch logs. If omitted, no logs will be exported. Valid values postgresql (PostgreSQL), upgrade (PostgreSQL)"
   type        = list(string)
   default     = []
+
+  validation {
+    condition = alltrue([
+      for s in var.enabled_cloudwatch_logs_exports : contains(["postgresql", "upgrade"], s)
+    ])
+    error_message = "value must be either postgresql or upgrade."
+  }
 }
 
 variable "cloudwatch_log_group_retention_in_days" {
   description = "The number of days to retain CloudWatch logs for the DB instance"
   type        = number
-  default     = 7
+  default     = 1
 }
 
 variable "cloudwatch_log_group_kms_key_id" {
@@ -564,9 +562,6 @@ variable "cloudwatch_log_group_kms_key_id" {
   type        = string
   default     = null
 }
-
-
-
 
 ################################################################################
 # Cluster specific variables
@@ -619,11 +614,11 @@ variable "cluster_enable_http_endpoint" {
   default     = null
 }
 
-variable "cluster_engine_mode" {
-  description = "The database engine mode. Valid values: `global`, `multimaster`, `parallelquery`, `provisioned`, `serverless`. Defaults to: `provisioned`"
-  type        = string
-  default     = "provisioned"
-}
+# variable "cluster_engine_mode" {
+#   description = "The database engine mode. Valid values: `global`, `multimaster`, `parallelquery`, `provisioned`, `serverless`. Defaults to: `provisioned`"
+#   type        = string
+#   default     = "provisioned"
+# }
 
 variable "cluster_global_cluster_identifier" {
   description = "The global cluster identifier specified on `aws_rds_global_cluster`"
@@ -833,8 +828,6 @@ variable "proxy_engine_family" {
   }
 }
 
-# get inspiration from https://dev.azure.com/dfds/Phoenix/_git/aws-modules-rds?path=/variables.tf&version=GBmaster
-
 variable "rds_proxy_security_group_ids" { # TODO: remove
   type    = list(string)
   default = []
@@ -858,9 +851,7 @@ variable "is_serverless" { # tempprary variable for testing
 ################################################################################
 # Security Group
 ################################################################################
-# variable "vpc_cidr_block" {
 
-# }
 variable "vpc_id" { # TODO: include?
   type    = string
   default = null

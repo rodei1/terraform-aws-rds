@@ -1,13 +1,3 @@
-# output "enhanced_monitoring_iam_role_name" {
-#   description = "The name of the monitoring role"
-#   value       = try(aws_iam_role.enhanced_monitoring[0].name, null)
-# }
-
-# output "enhanced_monitoring_iam_role_arn" {
-#   description = "The Amazon Resource Name (ARN) specifying the monitoring role"
-#   value       = try(aws_iam_role.enhanced_monitoring[0].arn, null)
-# }
-
 output "db_instance_address" {
   description = "The address of the RDS instance"
   value       = try(aws_db_instance.this.address, null)

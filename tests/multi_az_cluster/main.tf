@@ -43,9 +43,22 @@ module "rds_cluster_test" {
 
   rds_proxy_security_group_ids = [aws_security_group.rds_proxy_sg.id]
 
-  include_proxy = false
+  include_proxy = false # TODO: Test with proxy enabled. Hint: it should fail
 
-  monitoring_interval = 60
+  enhanced_monitoring_interval = 60
+
+
+  rds_security_group_rules = {
+    ingress_rules = [
+      {
+        from_port   = 5432
+        to_port     = 5432
+        protocol    = "tcp"
+        description = "PostgreSQL access from internet"
+        cidr_blocks = "0.0.0.0/0"
+      },
+    ]
+  }
 }
 
 

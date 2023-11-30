@@ -16,12 +16,7 @@ resource "aws_security_group" "this" {
   vpc_id                 = var.vpc_id
   revoke_rules_on_delete = var.revoke_rules_on_delete
 
-  tags = merge(
-    {
-      "Name" = format("%s", var.name)
-    },
-    var.tags,
-  )
+  tags = var.tags
 
   timeouts {
     create = var.create_timeout

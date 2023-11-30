@@ -13,12 +13,10 @@ locals {
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   tags = {
-    Name       = local.name
     Example    = local.name
-    Repository = "https://github.com/terraform-aws-modules/terraform-aws-rds"
+    Repository = "https://github.com/dfds/aws-modules-rds"
   }
 }
-
 
 module "rds_instance_test" {
   source     = "../../"
@@ -36,7 +34,7 @@ module "rds_instance_test" {
   publicly_accessible = true
 
   subnet_ids        = concat(module.vpc.public_subnets)
-  allocated_storage = 5
+  allocated_storage = 100
 
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1
@@ -73,7 +71,6 @@ module "rds_instance_test" {
       },
     ]
   }
-
 }
 
 

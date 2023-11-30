@@ -9,12 +9,14 @@ Terraform module for AWS RDS instances
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0, < 2.0.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_random"></a> [random](#provider\_random) | n/a |
+| <a name="provider_null"></a> [null](#provider\_null) | n/a |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 3.1 |
 
 ## Modules
 
@@ -35,6 +37,7 @@ Terraform module for AWS RDS instances
 
 | Name | Type |
 |------|------|
+| [null_resource.validate_instance_type_proxy](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_id.snapshot_identifier](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 
 ## Inputs
@@ -52,7 +55,7 @@ Terraform module for AWS RDS instances
 | <a name="input_ca_cert_identifier"></a> [ca\_cert\_identifier](#input\_ca\_cert\_identifier) | Specifies the identifier of the CA certificate for the DB instance | `string` | `null` | no |
 | <a name="input_character_set_name"></a> [character\_set\_name](#input\_character\_set\_name) | The character set name to use for DB encoding in Oracle instances. This can't be changed. See Oracle Character Sets Supported in Amazon RDS and Collations and Character Sets for Microsoft SQL Server for more information. This can only be set on creation | `string` | `null` | no |
 | <a name="input_cloudwatch_log_group_kms_key_id"></a> [cloudwatch\_log\_group\_kms\_key\_id](#input\_cloudwatch\_log\_group\_kms\_key\_id) | The ARN of the KMS Key to use when encrypting log data | `string` | `null` | no |
-| <a name="input_cloudwatch_log_group_retention_in_days"></a> [cloudwatch\_log\_group\_retention\_in\_days](#input\_cloudwatch\_log\_group\_retention\_in\_days) | The number of days to retain CloudWatch logs for the DB instance | `number` | `7` | no |
+| <a name="input_cloudwatch_log_group_retention_in_days"></a> [cloudwatch\_log\_group\_retention\_in\_days](#input\_cloudwatch\_log\_group\_retention\_in\_days) | The number of days to retain CloudWatch logs for the DB instance | `number` | `1` | no |
 | <a name="input_cluster_activity_stream_kms_key_id"></a> [cluster\_activity\_stream\_kms\_key\_id](#input\_cluster\_activity\_stream\_kms\_key\_id) | The AWS KMS key identifier for encrypting messages in the database activity stream | `string` | `null` | no |
 | <a name="input_cluster_activity_stream_mode"></a> [cluster\_activity\_stream\_mode](#input\_cluster\_activity\_stream\_mode) | Specifies the mode of the database activity stream. Database events such as a change or access generate an activity stream event. One of: sync, async | `string` | `null` | no |
 | <a name="input_cluster_autoscaling_enabled"></a> [cluster\_autoscaling\_enabled](#input\_cluster\_autoscaling\_enabled) | Determines whether autoscaling of the cluster read replicas is enabled | `bool` | `false` | no |
@@ -69,7 +72,6 @@ Terraform module for AWS RDS instances
 | <a name="input_cluster_enable_global_write_forwarding"></a> [cluster\_enable\_global\_write\_forwarding](#input\_cluster\_enable\_global\_write\_forwarding) | Whether cluster should forward writes to an associated global cluster. Applied to secondary clusters to enable them to forward writes to an `aws_rds_global_cluster`'s primary cluster | `bool` | `null` | no |
 | <a name="input_cluster_enable_http_endpoint"></a> [cluster\_enable\_http\_endpoint](#input\_cluster\_enable\_http\_endpoint) | Enable HTTP endpoint (data API). Only valid when engine\_mode is set to `serverless` | `bool` | `null` | no |
 | <a name="input_cluster_endpoints"></a> [cluster\_endpoints](#input\_cluster\_endpoints) | Map of additional cluster endpoints and their attributes to be created | `any` | `{}` | no |
-| <a name="input_cluster_engine_mode"></a> [cluster\_engine\_mode](#input\_cluster\_engine\_mode) | The database engine mode. Valid values: `global`, `multimaster`, `parallelquery`, `provisioned`, `serverless`. Defaults to: `provisioned` | `string` | `"provisioned"` | no |
 | <a name="input_cluster_engine_native_audit_fields_included"></a> [cluster\_engine\_native\_audit\_fields\_included](#input\_cluster\_engine\_native\_audit\_fields\_included) | Specifies whether the database activity stream includes engine-native audit fields. This option only applies to an Oracle DB instance. By default, no engine-native audit fields are included | `bool` | `false` | no |
 | <a name="input_cluster_global_cluster_identifier"></a> [cluster\_global\_cluster\_identifier](#input\_cluster\_global\_cluster\_identifier) | The global cluster identifier specified on `aws_rds_global_cluster` | `string` | `null` | no |
 | <a name="input_cluster_iam_roles"></a> [cluster\_iam\_roles](#input\_cluster\_iam\_roles) | Map of IAM roles and supported feature names to associate with the cluster | `map(map(string))` | `{}` | no |
@@ -104,7 +106,7 @@ Terraform module for AWS RDS instances
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | The database can't be deleted when this value is set to true | `bool` | `false` | no |
 | <a name="input_domain"></a> [domain](#input\_domain) | The ID of the Directory Service Active Directory domain to create the instance in | `string` | `null` | no |
 | <a name="input_domain_iam_role_name"></a> [domain\_iam\_role\_name](#input\_domain\_iam\_role\_name) | (Required if domain is provided) The name of the IAM role to be used when making API calls to the Directory Service | `string` | `null` | no |
-| <a name="input_enabled_cloudwatch_logs_exports"></a> [enabled\_cloudwatch\_logs\_exports](#input\_enabled\_cloudwatch\_logs\_exports) | List of log types to enable for exporting to CloudWatch logs. If omitted, no logs will be exported. Valid values (depending on engine): alert, audit, error, general, listener, slowquery, trace, postgresql (PostgreSQL), upgrade (PostgreSQL) | `list(string)` | `[]` | no |
+| <a name="input_enabled_cloudwatch_logs_exports"></a> [enabled\_cloudwatch\_logs\_exports](#input\_enabled\_cloudwatch\_logs\_exports) | List of log types to enable for exporting to CloudWatch logs. If omitted, no logs will be exported. Valid values postgresql (PostgreSQL), upgrade (PostgreSQL) | `list(string)` | `[]` | no |
 | <a name="input_engine"></a> [engine](#input\_engine) | The database engine to use | `string` | `"postgres"` | no |
 | <a name="input_enhanced_monitoring_create_role"></a> [enhanced\_monitoring\_create\_role](#input\_enhanced\_monitoring\_create\_role) | Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs | `bool` | `false` | no |
 | <a name="input_enhanced_monitoring_iam_role_path"></a> [enhanced\_monitoring\_iam\_role\_path](#input\_enhanced\_monitoring\_iam\_role\_path) | Path for the monitoring role | `string` | `null` | no |
@@ -119,7 +121,7 @@ Terraform module for AWS RDS instances
 | <a name="input_identifier"></a> [identifier](#input\_identifier) | The name of the RDS instance | `string` | n/a | yes |
 | <a name="input_idle_client_timeout"></a> [idle\_client\_timeout](#input\_idle\_client\_timeout) | Idle client timeout of the RDS proxy (keep connection alive) | `number` | `1800` | no |
 | <a name="input_include_proxy"></a> [include\_proxy](#input\_include\_proxy) | Optionally include proxy to help manage database connections | `bool` | `false` | no |
-| <a name="input_instance_class"></a> [instance\_class](#input\_instance\_class) | The instance type of the RDS instance | `string` | n/a | yes |
+| <a name="input_instance_class"></a> [instance\_class](#input\_instance\_class) | The instance type of the RDS instance | `string` | `""` | no |
 | <a name="input_instance_parameters"></a> [instance\_parameters](#input\_instance\_parameters) | A list of DB parameters (map) to apply | `list(map(string))` | `[]` | no |
 | <a name="input_instance_use_identifier_prefix"></a> [instance\_use\_identifier\_prefix](#input\_instance\_use\_identifier\_prefix) | Determines whether to use `identifier` as is or create a unique identifier beginning with `identifier` as the specified prefix | `bool` | `false` | no |
 | <a name="input_iops"></a> [iops](#input\_iops) | The amount of provisioned IOPS. Setting this implies a storage\_type of 'io1' or `gp3`. See `notes` for limitations regarding this variable for `gp3` | `number` | `null` | no |
@@ -129,7 +131,7 @@ Terraform module for AWS RDS instances
 | <a name="input_kubernetes_namespace"></a> [kubernetes\_namespace](#input\_kubernetes\_namespace) | The namespace used for IAM Role for ServiceAccount authentication from Kubernetes | `string` | `null` | no |
 | <a name="input_license_model"></a> [license\_model](#input\_license\_model) | License model information for this DB instance. Optional, but required for some DB engines, i.e. Oracle SE1 | `string` | `null` | no |
 | <a name="input_maintenance_window"></a> [maintenance\_window](#input\_maintenance\_window) | The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00' | `string` | `"Sat:18:00-Sat:20:00"` | no |
-| <a name="input_major_engine_version"></a> [major\_engine\_version](#input\_major\_engine\_version) | Specifies the major version of the engine that this option group should be associated with | `string` | `"14"` | no |
+| <a name="input_major_engine_version"></a> [major\_engine\_version](#input\_major\_engine\_version) | Specifies the major version of the engine that this option group should be associated with | `string` | `"15"` | no |
 | <a name="input_manage_master_user_password"></a> [manage\_master\_user\_password](#input\_manage\_master\_user\_password) | Set to true to allow RDS to manage the master user password in Secrets Manager | `bool` | `true` | no |
 | <a name="input_master_user_secret_kms_key_id"></a> [master\_user\_secret\_kms\_key\_id](#input\_master\_user\_secret\_kms\_key\_id) | The key ARN, key ID, alias ARN or alias name for the KMS key to encrypt the master user password secret in Secrets Manager.<br>  If not specified, the default KMS key for your Amazon Web Services account is used. | `string` | `null` | no |
 | <a name="input_max_allocated_storage"></a> [max\_allocated\_storage](#input\_max\_allocated\_storage) | Specifies the value for Storage Autoscaling | `number` | `0` | no |
@@ -172,8 +174,8 @@ Terraform module for AWS RDS instances
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to all resources | `map(string)` | `{}` | no |
 | <a name="input_timeouts"></a> [timeouts](#input\_timeouts) | Updated Terraform resource management timeouts. Applies to `aws_db_instance` in particular to permit resource management times | `map(string)` | `{}` | no |
 | <a name="input_timezone"></a> [timezone](#input\_timezone) | Time zone of the DB instance. timezone is currently only supported by Microsoft SQL Server. The timezone can only be set on creation. See MSSQL User Guide for more information | `string` | `null` | no |
-| <a name="input_username"></a> [username](#input\_username) | Username for the master DB user | `string` | `null` | no |
-| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | } | `string` | `null` | no |
+| <a name="input_username"></a> [username](#input\_username) | Username for the master DB user | `string` | n/a | yes |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | n/a | `string` | `null` | no |
 | <a name="input_vpc_security_group_ids"></a> [vpc\_security\_group\_ids](#input\_vpc\_security\_group\_ids) | List of VPC security groups to associate | `list(string)` | `[]` | no |
 
 ## Outputs

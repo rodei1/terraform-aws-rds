@@ -9,25 +9,25 @@ variable "db_identifier" {
   type        = string
 }
 
-variable "enabled_cloudwatch_logs_exports" {
+variable "enabled_cw_logs_exports" {
   description = "List of log types to enable for exporting to CloudWatch logs. If omitted, no logs will be exported. Valid values (depending on engine): alert, audit, error, general, listener, slowquery, trace, postgresql (PostgreSQL), upgrade (PostgreSQL)."
   type        = list(string)
   default     = []
 }
 
-variable "cloudwatch_log_group_retention_in_days" {
+variable "cw_log_group_retention_in_days" {
   description = "The number of days to retain CloudWatch logs for the DB instance"
   type        = number
   default     = 7
 }
 
-variable "cloudwatch_log_group_kms_key_id" {
+variable "cw_log_group_kms_key_id" {
   description = "The ARN of the KMS Key to use when encrypting log data"
   type        = string
   default     = null
 }
 
-variable "cloudwatch_log_group_skip_destroy_on_deletion" {
+variable "cw_log_group_skip_destroy_on_deletion" {
   description = "value to skip destroy ClouwWatch log group on deletion"
   type        = bool
   default     = false

@@ -40,11 +40,6 @@ variable "monitoring_iam_role_path" {
   default     = null
 }
 
-
-
-
-
-
 variable "iam_role_force_detach_policies" { # useful?
   description = "Whether to force detaching any policies the monitoring role has before destroying it"
   type        = bool

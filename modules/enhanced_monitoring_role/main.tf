@@ -26,12 +26,7 @@ resource "aws_iam_role" "enhanced_monitoring" {
   description          = var.monitoring_role_description
   permissions_boundary = var.monitoring_role_permissions_boundary
   path                 = var.monitoring_iam_role_path
-  tags = merge(
-    {
-      "Name" = format("%s", var.monitoring_role_name)
-    },
-    var.tags,
-  )
+  tags                 = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "enhanced_monitoring" {

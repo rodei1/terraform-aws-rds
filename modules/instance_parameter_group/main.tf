@@ -20,12 +20,7 @@ resource "aws_db_parameter_group" "this" {
     }
   }
 
-  tags = merge(
-    var.tags,
-    {
-      "Name" = var.name
-    },
-  )
+  tags = var.tags
 
   lifecycle {
     create_before_destroy = true

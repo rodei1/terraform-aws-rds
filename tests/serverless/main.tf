@@ -45,7 +45,19 @@ module "rds_cluster_test" {
 
   include_proxy = false
 
-  monitoring_interval = 60
+  enhanced_monitoring_interval = 60
+
+  rds_security_group_rules = {
+    ingress_rules = [
+      {
+        from_port   = 5432
+        to_port     = 5432
+        protocol    = "tcp"
+        description = "PostgreSQL access from internet"
+        cidr_blocks = "0.0.0.0/0"
+      },
+    ]
+  }
 }
 
 
