@@ -1,0 +1,105 @@
+name: QA pipeline for RDS blueprints
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - .github/**
+      - .gitignore
+      - .pre-commit-config.yaml
+      - .tflint.hcl
+      - LICENSE
+      - README.md
+      - renovate.json
+      - scripts/**
+      - tests/**
+
+  workflow_dispatch:
+
+concurrency: terragrunt
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_BLUEPRINTS_QA_DEPLOY_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_BLUEPRINTS_QA_DEPLOY_AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  qa-env:
+    runs-on: ubuntu-latest
+    container:
+      image: dfdsdk/python-pipeline:0.0.4
+    steps:
+      - name: Check environment variables
+        run: bash -c '[[ -z $AWS_ACCESS_KEY_ID || -z $AWS_SECRET_ACCESS_KEY ]] && exit 1 || true'
+
+      - name: Send alert if job fails
+        if: failure()
+        uses: dfds/shared-workflows/.github/actions/automation-slack-notifier@master
+        with:
+          slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
+          slack_message: Test environment variables failed.
+
+  qa-up:
+    runs-on: ubuntu-latest
+    needs: qa-env
+    container:
+      image: dfdsdk/python-pipeline:0.0.4
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: tests/qa
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+        working-directory: tests/qa
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -out qa.plan
+        working-directory: tests/qa
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -input=false -auto-approve qa.plan
+        working-directory: tests/qa
+
+      - name: Send alert if job fails
+        if: failure()
+        uses: dfds/shared-workflows/.github/actions/automation-slack-notifier@master
+        with:
+          slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
+          slack_message: Spin up QA environment failed.
+
+  qa-test:
+    runs-on: ubuntu-latest
+    needs: qa-up
+    container:
+      image: dfdsdk/python-pipeline:0.0.4
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Poetry install Python packages
+        id: poetry-install-packages
+        run: /etc/poetry/bin/poetry install
+        working-directory: scripts/qa
+
+      - name: Poetry run test case
+        id: poetry-run-test-case
+        run: /etc/poetry/bin/poetry run python3 rds.py || true
+        working-directory: scripts/qa
+
+      - name: Send alert if job fails
+        if: failure()
+        uses: dfds/shared-workflows/.github/actions/automation-slack-notifier@master
+        with:
+          slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
+          slack_message: Test QA environment failed.
