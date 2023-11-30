@@ -68,7 +68,7 @@ class QA:
                 return db
         return None
 
-    def qa_instance_exist(self) -> bool:
+    def instance_exist(self) -> bool:
         """
         Check if the QA instance exist.
 
@@ -77,6 +77,97 @@ class QA:
         instance: dict = self.__get_instance()
         if instance is not None:
             return True
+        return False
+
+    def is_instance_available(self) -> bool:
+        """
+        TODO
+
+        :return: bool
+        """
+        instance: dict = self.__get_instance()
+        if instance is not None:
+            instance_status: str = instance.get("DBInstanceStatus", None)
+            if instance_status is not None:
+                return True
+        return False
+
+    def is_username(self, username: str) -> bool:
+        """
+        TODO
+
+        :return: bool
+        """
+        instance: dict = self.__get_instance()
+        if instance is not None:
+            instance_username: str = instance.get("MasterUsername", None)
+            if instance_username == username:
+                return True
+        return False
+
+    def is_storage_size(self, size: int) -> bool:
+        """
+        TODO
+
+        :return: bool
+        """
+        instance: dict = self.__get_instance()
+        if instance is not None:
+            storage_size: int = instance.get("AllocatedStorage", -1)
+            if storage_size == size:
+                return True
+        return False
+
+    def is_backup_retention_period(self, period: int) -> bool:
+        """
+        TODO
+
+        :return: bool
+        """
+        instance: dict = self.__get_instance()
+        if instance is not None:
+            retention_period: int = instance.get("BackupRetentionPeriod", -1)
+            if retention_period == period:
+                return True
+        return False
+
+    def is_multi_az(self) -> bool:
+        """
+        TODO
+
+        :return: bool
+        """
+        instance: dict = self.__get_instance()
+        if instance is not None:
+            multi_az: bool = instance.get("MultiAZ", False)
+            if multi_az:
+                return True
+        return False
+
+    def is_storage_type(self, storage_type: str) -> bool:
+        """
+        TODO
+
+        :return: bool
+        """
+        instance: dict = self.__get_instance()
+        if instance is not None:
+            storage: str = instance.get("StorageType", None)
+            if storage == storage_type:
+                return True
+        return False
+
+    def is_storage_encrypted(self) -> bool:
+        """
+        TODO
+
+        :return: bool
+        """
+        instance: dict = self.__get_instance()
+        if instance is not None:
+            storage_encrypted: bool = instance.get("StorageEncrypted", False)
+            if storage_encrypted:
+                return True
         return False
 
     def __get_secretsmanager(self) -> str:
@@ -110,6 +201,11 @@ class QA:
         """
         secretsmanager: str = self.__get_secretsmanager()
         if secretsmanager is not None:
+            if self.username is None or self.password is None:
+                username, password = self.__get_secret()
+                self.username = username
+                self.password = password
+        if self.username is not None and self.password is not None:
             return True
         return False
 
@@ -133,34 +229,6 @@ class QA:
 
         secret: dict = json.loads(get_secret_value_response["SecretString"])
         return secret.get("username", None), secret.get("password", None)
-
-    def username_exist(self) -> bool:
-        """
-        Check if a username exist in the SecretsManager secret used by RDS.
-
-        :return: bool
-        """
-        if self.username is None:
-            username, password = self.__get_secret()
-            self.username = username
-            self.password = password
-        if self.username is not None:
-            return True
-        return False
-
-    def password_exist(self) -> bool:
-        """
-        Check if a password exist in the SecretsManager secret used by RDS.
-
-        :return: bool
-        """
-        if self.password is None:
-            username, password = self.__get_secret()
-            self.username = username
-            self.password = password
-        if self.password is not None:
-            return True
-        return False
 
     def __get_endpoint(self) -> (str, int):
         """
@@ -222,10 +290,15 @@ class QA:
 
 if __name__ == "__main__":
     qa = QA()
-    assert qa.qa_instance_exist()
+    assert qa.instance_exist()
     assert qa.secretsmanager_exist()
-    assert qa.username_exist()
-    assert qa.password_exist()
+    assert qa.is_instance_available()
+    assert qa.is_username("qa_user")
+    assert qa.is_storage_size(5)
+    assert qa.is_backup_retention_period(0)
+    assert qa.is_multi_az()
+    assert qa.is_storage_type("gp2")
+    assert qa.is_storage_encrypted()
     qa.connect_to_database()
     # This line will of course only be reached if all assert statement succeeds.
     print("All test cases succeeded")
