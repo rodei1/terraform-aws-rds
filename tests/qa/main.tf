@@ -21,6 +21,7 @@ module "rds_instance_test" {
   source                                 = "../../"
   identifier                             = local.name
   instance_class                         = "db.t3.micro"
+  db_name                                = "db1"
   multi_az                               = true
   username                               = "qa_user"
   ca_cert_identifier                     = "rds-ca-ecc384-g1"
