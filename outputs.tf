@@ -10,7 +10,7 @@
 
 output "kubernetes_serviceaccount" {
   description = "If you create this Kubernetes ServiceAccount, you will get access to the RDS through IRSA"
-  value       = try(<<EOT
+  value = try(<<EOT
 
 apiVersion: v1
 kind: ServiceAccount
@@ -32,4 +32,9 @@ output "iam_role_arn_for_aws_services" {
 output "iam_instance_profile_for_ec2" {
   description = "The name of the EC2 instance profile that is using the IAM Role that give AWS services access to the RDS instance and Secrets Manager"
   value       = try(module.db_instance[0].iam_instance_profile_for_ec2, null)
+}
+
+output "instance_engine_info" {
+  description = "The engine info for the selected engine of the RDS instance"
+  value       = jsonencode(data.aws_rds_engine_version.engine_info)
 }

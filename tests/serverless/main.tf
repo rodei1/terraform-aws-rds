@@ -45,6 +45,8 @@ module "rds_cluster_test" {
 
   include_proxy = false
 
+
+  engine_version               = "13"
   enhanced_monitoring_interval = 60
 
   rds_security_group_rules = {
@@ -116,8 +118,7 @@ resource "aws_security_group" "rds_proxy_sg" { # TODO: add conditional to only c
   name        = "rds-proxy-${local.name}"
   description = "A security group for ${local.name} database proxy"
   vpc_id      = module.vpc.vpc_id
-
-  tags = local.tags
+  tags        = local.tags
 
   # Proxy requires self referencing inbound rule
   ingress {

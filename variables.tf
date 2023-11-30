@@ -88,21 +88,11 @@ variable "domain_iam_role_name" {
   default     = null
 }
 
-variable "engine" {
-  description = "The database engine to use"
+variable "engine_version" {
+  description = "The engine version to use. If not specified the preffered version will be used. It is also possible to pass major version in this format \"15\". Note: that a specific version must be valid and this can be obtained from this documentation: https://docs.aws.amazon.com/AmazonRDS/latest/PostgreSQLReleaseNotes/postgresql-release-calendar.html"
   type        = string
-  default     = "postgres"
-  validation {
-    condition     = contains(["aurora-postgresql", "postgres"], var.engine)
-    error_message = "Invalid value for var.engine. Supported values: aurora-postgresql, postgres."
-  }
+  default     = null
 }
-
-# variable "engine_version" {
-#   description = "The engine version to use"
-#   type        = string
-#   default     = "14.9"
-# }
 
 variable "skip_final_snapshot" {
   description = "Determines whether a final DB snapshot is created before the DB instance is deleted. If true is specified, no DBSnapshot is created. If false is specified, a DB snapshot is created before the DB instance is deleted"
@@ -434,14 +424,6 @@ variable "option_group_description" {
   description = "The description of the option group"
   type        = string
   default     = null
-}
-
-variable "major_engine_version" { # TODO: introduce latest as default
-  description = "Specifies the major version of the engine that this option group should be associated with"
-  type        = string
-  # default     = null
-  default = "15" # default to latest?
-  # All available versions: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html#PostgreSQL.Concepts
 }
 
 variable "options" {

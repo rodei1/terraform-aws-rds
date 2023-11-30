@@ -4,8 +4,7 @@ locals {
   # Parameter group
   ########################################################################
   create_db_parameter_group = true
-  # parameter_group_name_id = local.create_db_parameter_group ? module.db_parameter_group.db_parameter_group_id : var.parameter_group_name
-  parameter_group_family = local.create_db_parameter_group && var.parameter_group_family == null ? "${var.engine}${var.major_engine_version}" : var.parameter_group_family
+  parameter_group_family    = data.aws_rds_engine_version.engine_info.parameter_group_family
 
   instance_parameters = concat([
     {
@@ -71,7 +70,9 @@ locals {
 
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.final_snapshot_identifier_prefix}-${var.identifier}-${try(random_id.snapshot_identifier[0].hex, "")}"
 
-  engine_version = var.major_engine_version
+  engine                  = local.is_serverless ? "aurora-postgresql" : "postgres"
+  engine_version          = data.aws_rds_engine_version.engine_info.version
+  is_major_engine_version = try(length(regexall("\\.[0-9]+$", var.engine_version)) > 0, true) # For example, 15 is a major version, but 15.5 is not
 }
 
 

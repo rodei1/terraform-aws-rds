@@ -22,34 +22,24 @@ module "rds_instance_test" {
   source     = "../../"
   identifier = local.name
 
-  instance_class = "db.t3.micro"
-  multi_az       = true
-  username       = "instance_user"
-  # vpc_security_group_ids = [module.security_group.security_group_id]
-  ca_cert_identifier = "rds-ca-ecc384-g1"
-  apply_immediately  = true
-  tags               = local.tags
-
-
-  publicly_accessible = true
-
-  subnet_ids        = concat(module.vpc.public_subnets)
-  allocated_storage = 100
-
+  instance_class                         = "db.t3.micro"
+  multi_az                               = true
+  username                               = "instance_user"
+  ca_cert_identifier                     = "rds-ca-ecc384-g1"
+  apply_immediately                      = true
+  tags                                   = local.tags
+  publicly_accessible                    = true
+  allocated_storage                      = 5
+  subnet_ids                             = concat(module.vpc.public_subnets)
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1
-
-  rds_proxy_security_group_ids = [aws_security_group.rds_proxy_sg.id]
-
-  include_proxy       = true
-  proxy_debug_logging = true
-
-  enhanced_monitoring_interval = 0
-
-  allow_major_version_upgrade = true # default ?
-  major_engine_version        = 16
-
-  performance_insights_enabled = true
+  rds_proxy_security_group_ids           = [aws_security_group.rds_proxy_sg.id]
+  include_proxy                          = true
+  proxy_debug_logging                    = true
+  enhanced_monitoring_interval           = 0
+  allow_major_version_upgrade            = true
+  engine_version                         = "15.4"
+  performance_insights_enabled           = true
 
   # Group variables into maps
   vpc_id = module.vpc.vpc_id
@@ -73,8 +63,6 @@ module "rds_instance_test" {
   }
 }
 
-
-
 ################################################################################
 # Supporting Resources
 ################################################################################
@@ -90,8 +78,6 @@ module "vpc" {
   public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
   private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 3)]
   # database_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 6)]
-
-  # create_database_subnet_group = true
 
   tags = local.tags
 }
