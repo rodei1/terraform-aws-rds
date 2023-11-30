@@ -68,7 +68,7 @@ jobs:
 
       - name: Terraform Apply
         id: apply
-        run: terraform apply -input=false -auto-approve
+        run: terraform apply -input=false -auto-approve qa.plan
         working-directory: tests/qa
 
       - name: Send alert if job fails
