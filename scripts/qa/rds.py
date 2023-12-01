@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # pylint: disable=W1203,R0902
 """
-QA test cases
+QA test cases. Refactor to use https://docs.python.org/3/library/unittest.html
 """
 
 import json
@@ -38,10 +38,9 @@ class QA:
         self.region: str = region
         self.log_level: int = log_level
         self.database: str = database
-        self.address: str = None
-        self.port: int = None
-        self.username: str = None
-        self.password: str = None
+        self.endpoint: dict = None
+        self.secret: dict = None
+        self.instance: dict = None
         self.session = boto3.session.Session()
         logging.info("Class initialized")
 
@@ -62,11 +61,22 @@ class QA:
 
         :return: dict
         """
-        dbs: dict = self.__get_databases()
-        for db in dbs["DBInstances"]:
-            if db["DBInstanceIdentifier"] == "qa":
-                return db
+        instance: dict = self.instance
+        if instance is None:
+            dbs: dict = self.__get_databases()
+            for db in dbs["DBInstances"]:
+                if db["DBInstanceIdentifier"] == "qa":
+                    self.__set_instance(db)
+                    return db
+        else:
+            return instance
         return None
+
+    def __set_instance(self, instance: dict) -> None:
+        """
+        Set the instance value for the instance of the class.
+        """
+        self.instance = instance
 
     def instance_exist(self) -> bool:
         """
@@ -81,7 +91,7 @@ class QA:
 
     def is_instance_available(self) -> bool:
         """
-        TODO
+        Check if the instance is available
 
         :return: bool
         """
@@ -94,7 +104,7 @@ class QA:
 
     def is_username(self, username: str) -> bool:
         """
-        TODO
+        Check that the username has the expected value
 
         :return: bool
         """
@@ -107,7 +117,7 @@ class QA:
 
     def is_storage_size(self, size: int) -> bool:
         """
-        TODO
+        Check that the storage has the expected size.
 
         :return: bool
         """
@@ -120,7 +130,7 @@ class QA:
 
     def is_backup_retention_period(self, period: int) -> bool:
         """
-        TODO
+        Check that the backup retention period is as expected.
 
         :return: bool
         """
@@ -133,7 +143,7 @@ class QA:
 
     def is_multi_az(self) -> bool:
         """
-        TODO
+        Check if the instance is configured with multi AZ.
 
         :return: bool
         """
@@ -146,7 +156,7 @@ class QA:
 
     def is_storage_type(self, storage_type: str) -> bool:
         """
-        TODO
+        Check that the storage is of the expected size.
 
         :return: bool
         """
@@ -159,7 +169,7 @@ class QA:
 
     def is_storage_encrypted(self) -> bool:
         """
-        TODO
+        Check that the storage is encrypted.
 
         :return: bool
         """
@@ -201,74 +211,99 @@ class QA:
         """
         secretsmanager: str = self.__get_secretsmanager()
         if secretsmanager is not None:
-            if self.username is None or self.password is None:
-                username, password = self.__get_secret()
-                self.username = username
-                self.password = password
-        if self.username is not None and self.password is not None:
+            secret = self.__get_secret()
+            if secret is None:
+                secret = self.__get_secret()
+                self.__set_secret(secret)
+        if secret is not None:
             return True
         return False
 
-    def __get_secret(self) -> (str, str):
+    def __get_secret(self) -> dict:
         """
         Get the username and password to RDS from a Secrets Manager
 
-        :return: (str, str)
+        :return: dict
         """
-        client = self.session.client(
-            service_name="secretsmanager", region_name=self.region
-        )
+        secret: dict = self.secret
+        if secret is None:
+            client = self.session.client(
+                service_name="secretsmanager", region_name=self.region
+            )
 
-        secret_name: str = self.__get_secretsmanager()
+            secret_name: str = self.__get_secretsmanager()
 
-        try:
-            logging.info("Connected to Secrets Manager")
-            get_secret_value_response = client.get_secret_value(SecretId=secret_name)
-        except ClientError as e:
-            raise e
+            try:
+                logging.info("Connected to Secrets Manager")
+                get_secret_value_response = client.get_secret_value(
+                    SecretId=secret_name
+                )
+            except ClientError:
+                return None
 
-        secret: dict = json.loads(get_secret_value_response["SecretString"])
-        return secret.get("username", None), secret.get("password", None)
+            secret = json.loads(get_secret_value_response["SecretString"])
+            if secret is None:
+                return None
+            self.__set_secret(secret)
+        return secret
 
-    def __get_endpoint(self) -> (str, int):
+    def __set_secret(self, secret: dict) -> None:
         """
-        Get the address and port number from the RDS instance endpoint.
-
-        :return: (str, int)
+        Set the secret value for the instance of the class.
         """
-        instance: dict = self.__get_instance()
-        if instance is not None:
-            endpoint: dict = instance.get("Endpoint", None)
-            if endpoint is not None:
-                address: str = endpoint.get("Address", None)
-                port: int = endpoint.get("Port", None)
-            if address is not None or port is not None:
-                return address, port
-        return None, None
+        self.secret = secret
+
+    def __get_endpoint(self) -> dict:
+        """
+        Get the RDS instance endpoint.
+
+        :return: dict
+        """
+        endpoint: dict = self.endpoint
+        if endpoint is None:
+            instance: dict = self.__get_instance()
+            if instance is not None:
+                endpoint = instance.get("Endpoint", None)
+                if endpoint is not None:
+                    self.__set_endpoint(endpoint)
+                    return endpoint
+                return None
+        return endpoint
+
+    def __set_endpoint(self, endpoint: dict) -> None:
+        """
+        Set the endpoint value
+        """
+        self.endpoint = endpoint
 
     def connect_to_database(self) -> None:
         """
         Connect to the database and execute a simple query
-
         """
-        if self.address is None or self.port is None:
-            address, port = self.__get_endpoint()
-            self.address = address
-            self.port = port
+        endpoint: dict = self.__get_endpoint()
+        if endpoint is None:
+            endpoint: dict = self.__get_endpoint()
+            self.__set_endpoint(endpoint)
 
-        if self.username is None or self.password is None:
-            username, password = self.__get_secret()
-            self.username = username
-            self.password = password
+        address = endpoint.get("Address", None)
+        port = endpoint.get("Port", 0)
 
-        logging.info(f"Connecting to {address}:{port}")
+        secret: dict = self.__get_secret()
+        if secret is None:
+            secret: dict = self.__get_secret()
+            self.__set_secret(secret)
+
+        username = secret.get("username", None)
+        password = secret.get("password", None)
+
+        logging.info(f"Connecting to {address}:{port} as {username}")
 
         conn = psycopg2.connect(
             dbname=self.database,
-            user=self.username,
-            password=self.password,
-            host=self.address,
-            port=self.port,
+            user=username,
+            password=password,
+            host=address,
+            port=port,
             sslmode="verify-full",
         )
 
@@ -291,8 +326,8 @@ class QA:
 if __name__ == "__main__":
     qa = QA()
     assert qa.instance_exist()
-    assert qa.secretsmanager_exist()
     assert qa.is_instance_available()
+    assert qa.secretsmanager_exist()
     assert qa.is_username("qa_user")
     assert qa.is_storage_size(5)
     assert qa.is_backup_retention_period(0)
