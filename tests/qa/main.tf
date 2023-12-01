@@ -32,7 +32,7 @@ module "rds_instance_test" {
   allocated_storage                      = 5
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1
-  rds_proxy_security_group_ids           = [aws_security_group.rds_proxy_sg.id]
+  #rds_proxy_security_group_ids           = [aws_security_group.rds_proxy_sg.id]
   include_proxy                          = true
   proxy_debug_logging                    = true
   enhanced_monitoring_interval           = 0
