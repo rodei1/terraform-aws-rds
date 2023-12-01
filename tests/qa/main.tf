@@ -37,7 +37,7 @@ module "rds_instance_test" {
   proxy_debug_logging                    = true
   enhanced_monitoring_interval           = 0
   allow_major_version_upgrade            = true
-  major_engine_version                   = 16
+  engine_version                         = "16.1"
   performance_insights_enabled           = true
   vpc_id                                 = module.vpc.vpc_id
 
