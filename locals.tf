@@ -73,20 +73,6 @@ locals {
   engine                  = local.is_serverless ? "aurora-postgresql" : "postgres"
   engine_version          = data.aws_rds_engine_version.engine_info.version
   is_major_engine_version = try(length(regexall("\\.[0-9]+$", var.engine_version)) > 0, true) # For example, 15 is a major version, but 15.5 is not
-}
 
-
-resource "null_resource" "validate_instance_type_proxy" { # need to enforce dependency in proxy module
-  count = var.is_db_cluster && var.include_proxy ? 1 : 0
-
-  provisioner "local-exec" {
-    command = "Running a check"
-  }
-
-  lifecycle {
-    precondition {
-      condition     = var.is_db_cluster && var.include_proxy
-      error_message = "Cannot create a proxy for a DB cluster"
-    }
-  }
+  password = var.manage_master_user_password ? null : var.password
 }

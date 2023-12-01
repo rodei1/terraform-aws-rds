@@ -33,6 +33,7 @@ Terraform module for AWS RDS instances
 | <a name="module_db_subnet_group"></a> [db\_subnet\_group](#module\_db\_subnet\_group) | ./modules/rds_subnet_group | n/a |
 | <a name="module_enhanced_monitoring_iam_role"></a> [enhanced\_monitoring\_iam\_role](#module\_enhanced\_monitoring\_iam\_role) | ./modules/enhanced_monitoring_role | n/a |
 | <a name="module_security_group"></a> [security\_group](#module\_security\_group) | ./modules/security_group | n/a |
+| <a name="module_security_group_proxy"></a> [security\_group\_proxy](#module\_security\_group\_proxy) | ./modules/security_group | n/a |
 
 ## Resources
 
@@ -158,9 +159,9 @@ Terraform module for AWS RDS instances
 | <a name="input_proxy_engine_family"></a> [proxy\_engine\_family](#input\_proxy\_engine\_family) | Engine family of the RDS proxy. Default: POSTGRESQL | `string` | `"POSTGRESQL"` | no |
 | <a name="input_proxy_name"></a> [proxy\_name](#input\_proxy\_name) | Name of the RDS proxy. Will be auto-generated if not specified | `string` | `null` | no |
 | <a name="input_proxy_require_tls"></a> [proxy\_require\_tls](#input\_proxy\_require\_tls) | Require tls on the RDS proxy. Default: true | `bool` | `true` | no |
+| <a name="input_proxy_security_group_rules"></a> [proxy\_security\_group\_rules](#input\_proxy\_security\_group\_rules) | n/a | <pre>object({<br>    ingress_rules     = list(any)<br>    ingress_with_self = optional(list(any), [])<br>  })</pre> | <pre>{<br>  "ingress_rules": []<br>}</pre> | no |
 | <a name="input_publicly_accessible"></a> [publicly\_accessible](#input\_publicly\_accessible) | Bool to control if instance is publicly accessible | `bool` | `false` | no |
 | <a name="input_rds_proxy_iam_auth"></a> [rds\_proxy\_iam\_auth](#input\_rds\_proxy\_iam\_auth) | n/a | `string` | `"DISABLED"` | no |
-| <a name="input_rds_proxy_security_group_ids"></a> [rds\_proxy\_security\_group\_ids](#input\_rds\_proxy\_security\_group\_ids) | n/a | `list(string)` | `[]` | no |
 | <a name="input_rds_security_group_rules"></a> [rds\_security\_group\_rules](#input\_rds\_security\_group\_rules) | n/a | <pre>object({<br>    ingress_rules     = list(any)<br>    ingress_with_self = optional(list(any), [])<br>  })</pre> | n/a | yes |
 | <a name="input_replica_mode"></a> [replica\_mode](#input\_replica\_mode) | Specifies whether the replica is in either mounted or open-read-only mode. This attribute is only supported by Oracle instances. Oracle replicas operate in open-read-only mode unless otherwise specified | `string` | `null` | no |
 | <a name="input_replicate_source_db"></a> [replicate\_source\_db](#input\_replicate\_source\_db) | Specifies that this resource is a Replicate database, and to use this value as the source database. This correlates to the identifier of another Amazon RDS Database to replicate | `string` | `null` | no |

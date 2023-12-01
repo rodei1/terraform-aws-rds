@@ -20,11 +20,10 @@ locals {
 }
 
 
-module "rds_cluster_test" {
+module "rds_serverless_test" {
   source     = "../../"
   identifier = local.name
 
-  #   is_db_cluster = true
   is_serverless             = true
   cluster_db_instance_count = 0
   username                  = "cluster_user"
@@ -41,10 +40,11 @@ module "rds_cluster_test" {
 
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 
-  rds_proxy_security_group_ids = [aws_security_group.rds_proxy_sg.id]
-
+  ########################################################################
+  # TODO: Fix this is not working with serverless atm because of missing IAM role.
+  # See how it is implemented in the instance module
   include_proxy = false
-
+  ########################################################################
 
   engine_version               = "13"
   enhanced_monitoring_interval = 60
@@ -110,29 +110,4 @@ module "security_group" { # update with another rule for public access
   ]
 
   tags = local.tags
-}
-
-
-resource "aws_security_group" "rds_proxy_sg" { # TODO: add conditional to only create when proxy is enabled
-
-  name        = "rds-proxy-${local.name}"
-  description = "A security group for ${local.name} database proxy"
-  vpc_id      = module.vpc.vpc_id
-  tags        = local.tags
-
-  # Proxy requires self referencing inbound rule
-  ingress {
-    from_port = 5432
-    to_port   = 5432
-    protocol  = "tcp"
-    self      = true
-  }
-
-  # Allow outbound all traffic
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }

@@ -471,52 +471,37 @@ resource "aws_security_group_rule" "ingress_with_self" {
 #   protocol  = var.rules[var.computed_egress_rules[count.index]][2]
 # }
 
-# #########################
-# # Egress - Maps of rules
-# #########################
-# # Security group rules with "source_security_group_id", but without "cidr_blocks" and "self"
-# resource "aws_security_group_rule" "egress_with_source_security_group_id" {
-#   count = local.create ? length(var.egress_with_source_security_group_id) : 0
+#########################
+# Egress - Maps of rules
+#########################
+# Security group rules with "source_security_group_id", but without "cidr_blocks" and "self"
+resource "aws_security_group_rule" "egress_with_source_security_group_id" {
+  count = length(var.egress_with_source_security_group_id)
 
-#   security_group_id = local.this_sg_id
-#   type              = "egress"
+  security_group_id = local.this_sg_id
+  type              = "egress"
 
-#   source_security_group_id = var.egress_with_source_security_group_id[count.index]["source_security_group_id"]
-#   prefix_list_ids          = var.egress_prefix_list_ids
-#   description = lookup(
-#     var.egress_with_source_security_group_id[count.index],
-#     "description",
-#     "Egress Rule",
-#   )
+  source_security_group_id = var.egress_with_source_security_group_id[count.index]["source_security_group_id"]
+  prefix_list_ids          = var.egress_prefix_list_ids
+  description = lookup(
+    var.egress_with_source_security_group_id[count.index],
+    "description",
+    "Egress Rule",
+  )
 
-#   from_port = lookup(
-#     var.egress_with_source_security_group_id[count.index],
-#     "from_port",
-#     var.rules[lookup(
-#       var.egress_with_source_security_group_id[count.index],
-#       "rule",
-#       "_",
-#     )][0],
-#   )
-#   to_port = lookup(
-#     var.egress_with_source_security_group_id[count.index],
-#     "to_port",
-#     var.rules[lookup(
-#       var.egress_with_source_security_group_id[count.index],
-#       "rule",
-#       "_",
-#     )][1],
-#   )
-#   protocol = lookup(
-#     var.egress_with_source_security_group_id[count.index],
-#     "protocol",
-#     var.rules[lookup(
-#       var.egress_with_source_security_group_id[count.index],
-#       "rule",
-#       "_",
-#     )][2],
-#   )
-# }
+  from_port = lookup(
+    var.egress_with_source_security_group_id[count.index],
+    "from_port",
+  )
+  to_port = lookup(
+    var.egress_with_source_security_group_id[count.index],
+    "to_port",
+  )
+  protocol = lookup(
+    var.egress_with_source_security_group_id[count.index],
+    "protocol",
+  )
+}
 
 # # Computed - Security group rules with "source_security_group_id", but without "cidr_blocks" and "self"
 # resource "aws_security_group_rule" "computed_egress_with_source_security_group_id" {

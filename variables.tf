@@ -97,8 +97,7 @@ variable "engine_version" {
 variable "skip_final_snapshot" {
   description = "Determines whether a final DB snapshot is created before the DB instance is deleted. If true is specified, no DBSnapshot is created. If false is specified, a DB snapshot is created before the DB instance is deleted"
   type        = bool
-  #   default     = false
-  default = true # Snapshots are already created by the AWS backup job.
+  default     = true # Snapshots are already created by the AWS backup job.
 }
 
 variable "snapshot_identifier" {
@@ -331,14 +330,6 @@ variable "db_subnet_group_tags" {
   type        = map(string)
   default     = {}
 }
-
-# DB subnet group
-# variable "create_db_subnet_group" {
-#   description = "Whether to create a database subnet group"
-#   type        = bool
-#   default     = false
-
-# }
 
 variable "db_subnet_group_name" {
   description = "Name of DB subnet group. DB instance will be created in the VPC associated with the DB subnet group. If unspecified, will be created in the default VPC"
@@ -810,9 +801,14 @@ variable "proxy_engine_family" {
   }
 }
 
-variable "rds_proxy_security_group_ids" { # TODO: remove
-  type    = list(string)
-  default = []
+variable "proxy_security_group_rules" {
+  type = object({
+    ingress_rules     = list(any)
+    ingress_with_self = optional(list(any), [])
+  })
+  default = {
+    ingress_rules = []
+  }
 }
 
 variable "rds_proxy_iam_auth" {

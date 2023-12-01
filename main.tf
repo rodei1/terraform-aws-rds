@@ -12,6 +12,21 @@ resource "random_id" "snapshot_identifier" {
   byte_length = 4
 }
 
+resource "null_resource" "validate_instance_type_proxy" { # TODO: need to enforce dependency in proxy module
+  count = var.is_db_cluster && var.include_proxy ? 1 : 0
+
+  provisioner "local-exec" {
+    command = "Running a check"
+  }
+
+  lifecycle {
+    precondition {
+      condition     = var.is_db_cluster && var.include_proxy
+      error_message = "Cannot create a proxy for a DB cluster"
+    }
+  }
+}
+
 # Create a parameter group by default to contain the options we need
 module "db_parameter_group" {
   source          = "./modules/instance_parameter_group"
@@ -68,7 +83,7 @@ module "db_instance" {
   license_model                         = var.license_model
   db_name                               = var.db_name
   username                              = var.username
-  password                              = var.manage_master_user_password ? null : var.password # TODO: Move to locals
+  password                              = local.password
   port                                  = var.port
   domain                                = var.domain
   domain_iam_role_name                  = var.domain_iam_role_name
@@ -143,7 +158,7 @@ module "db_multi_az_cluster" {
   backup_retention_period         = null # Backup is managed by the organization
   db_cluster_instance_class       = var.instance_class
   master_username                 = var.username
-  master_password                 = var.password
+  master_password                 = local.password
   manage_master_user_password     = var.manage_master_user_password
   apply_immediately               = var.apply_immediately
   storage_encrypted               = var.storage_encrypted
@@ -194,8 +209,8 @@ module "db_proxy" {
   engine_family                         = var.proxy_engine_family
   idle_client_timeout                   = var.idle_client_timeout
   require_tls                           = var.proxy_require_tls
-  role_arn                              = try(module.db_instance[0].iam_role_for_aws_services.arn, null)
-  vpc_security_group_ids                = var.rds_proxy_security_group_ids
+  role_arn                              = try(module.db_instance[0].iam_role_for_aws_services.arn, module.db_cluster_serverless[0].iam_role_for_aws_services.arn, null) # TODO: Fix iam_role_for_aws_services for db_cluster_serverless by adding required IAM resources
+  vpc_security_group_ids                = [module.security_group_proxy[0].security_group_id]
   vpc_subnet_ids                        = var.subnet_ids
   proxy_tags                            = var.tags
   connection_borrow_timeout             = null
@@ -216,7 +231,7 @@ module "db_proxy" {
 
 }
 
-module "security_group" { # update with another rule for public access
+module "security_group" { # TODO: update with another rule for public access
   source                   = "./modules/security_group"
   name                     = var.identifier
   description              = "RDS PostgreSQL security group"
@@ -224,4 +239,27 @@ module "security_group" { # update with another rule for public access
   ingress_with_cidr_blocks = var.rds_security_group_rules.ingress_rules
   ingress_with_self        = var.rds_security_group_rules.ingress_with_self
   tags                     = var.tags
+}
+
+module "security_group_proxy" {
+  source                   = "./modules/security_group"
+  count                    = var.include_proxy ? 1 : 0
+  name                     = var.identifier
+  description              = "RDS PostgreSQL security group for proxy"
+  vpc_id                   = var.vpc_id
+  ingress_with_cidr_blocks = var.proxy_security_group_rules.ingress_rules
+  ingress_with_self = concat([{
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
+    description = "PostgreSQL access from within Security Gruop" }],
+  var.proxy_security_group_rules.ingress_with_self)
+  egress_with_cidr_blocks = [{
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    description = "Allow all outbound traffic"
+    cidr_blocks = "0.0.0.0/0"
+  }]
+  tags = var.tags
 }

@@ -33,7 +33,6 @@ module "rds_instance_test" {
   subnet_ids                             = concat(module.vpc.public_subnets)
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1
-  rds_proxy_security_group_ids           = [aws_security_group.rds_proxy_sg.id]
   include_proxy                          = true
   proxy_debug_logging                    = true
   enhanced_monitoring_interval           = 0
@@ -80,30 +79,4 @@ module "vpc" {
   # database_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 6)]
 
   tags = local.tags
-}
-
-
-resource "aws_security_group" "rds_proxy_sg" { # TODO: add conditional to only create when proxy is enabled
-
-  name        = "rds-proxy-${local.name}"
-  description = "A security group for ${local.name} database proxy"
-  vpc_id      = module.vpc.vpc_id
-
-  tags = local.tags
-
-  # Proxy requires self referencing inbound rule
-  ingress {
-    from_port = 5432
-    to_port   = 5432
-    protocol  = "tcp"
-    self      = true
-  }
-
-  # Allow outbound all traffic
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
