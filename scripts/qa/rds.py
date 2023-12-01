@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # pylint: disable=W1203,R0902
 """
-QA test cases. Refactor to use https://docs.python.org/3/library/unittest.html
+RDS
 """
 
 import json
@@ -42,7 +42,7 @@ class QA:
         self.secret: dict = None
         self.instance: dict = None
         self.session = boto3.session.Session()
-        logging.info("Class initialized")
+        logging.debug("Class initialized")
 
     def __get_databases(self) -> dict:
         """
@@ -67,6 +67,7 @@ class QA:
             for db in dbs["DBInstances"]:
                 if db["DBInstanceIdentifier"] == "qa":
                     self.__set_instance(db)
+                    logging.debug(db)
                     return db
         else:
             return instance
@@ -102,44 +103,42 @@ class QA:
                 return True
         return False
 
-    def is_username(self, username: str) -> bool:
+    def get_username_from_instance(self) -> str:
         """
-        Check that the username has the expected value
+        Return the username from the instance.
 
-        :return: bool
+        :return: str
         """
         instance: dict = self.__get_instance()
         if instance is not None:
-            instance_username: str = instance.get("MasterUsername", None)
-            if instance_username == username:
-                return True
-        return False
+            username: str = instance.get("MasterUsername", None)
+            if username is not None:
+                return username
+        return None
 
-    def is_storage_size(self, size: int) -> bool:
+    def get_storage_size_from_instance(self) -> int:
         """
-        Check that the storage has the expected size.
+        Return the storage size from the instance.
 
-        :return: bool
+        :return: int
         """
         instance: dict = self.__get_instance()
         if instance is not None:
             storage_size: int = instance.get("AllocatedStorage", -1)
-            if storage_size == size:
-                return True
-        return False
+            return storage_size
+        return None
 
-    def is_backup_retention_period(self, period: int) -> bool:
+    def get_backup_retention_period(self) -> int:
         """
-        Check that the backup retention period is as expected.
+        Return the backup retention period from the instance.
 
-        :return: bool
+        :return: int
         """
         instance: dict = self.__get_instance()
         if instance is not None:
             retention_period: int = instance.get("BackupRetentionPeriod", -1)
-            if retention_period == period:
-                return True
-        return False
+            return retention_period
+        return None
 
     def is_multi_az(self) -> bool:
         """
@@ -154,18 +153,31 @@ class QA:
                 return True
         return False
 
-    def is_storage_type(self, storage_type: str) -> bool:
+    def get_storage_type_from_instance(self) -> str:
         """
-        Check that the storage is of the expected size.
+        Return the storage type from the instance.
 
-        :return: bool
+        :return: str
         """
         instance: dict = self.__get_instance()
         if instance is not None:
             storage: str = instance.get("StorageType", None)
-            if storage == storage_type:
-                return True
-        return False
+            if storage is not None:
+                return storage
+        return None
+
+    def get_certificate_ca(self) -> str:
+        """
+        Return the Certificate CA Identifier from the instance.
+        """
+        instance: dict = self.__get_instance()
+        if instance is not None:
+            cert_details: str = instance.get("CertificateDetails", None)
+            if cert_details is not None:
+                ca: str = cert_details.get("CAIdentifier", None)
+                if ca is not None:
+                    return ca
+        return None
 
     def is_storage_encrypted(self) -> bool:
         """
@@ -321,19 +333,3 @@ class QA:
             except psycopg2.DatabaseError as db_error:
                 logging.error(db_error)
         conn.close()
-
-
-if __name__ == "__main__":
-    qa = QA()
-    assert qa.instance_exist()
-    assert qa.is_instance_available()
-    assert qa.secretsmanager_exist()
-    assert qa.is_username("qa_user")
-    assert qa.is_storage_size(5)
-    assert qa.is_backup_retention_period(0)
-    assert qa.is_multi_az()
-    assert qa.is_storage_type("gp2")
-    assert qa.is_storage_encrypted()
-    qa.connect_to_database()
-    # This line will of course only be reached if all assert statement succeeds.
-    print("All test cases succeeded")
