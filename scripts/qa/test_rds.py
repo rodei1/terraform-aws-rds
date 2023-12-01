@@ -3,6 +3,7 @@
 """
 QA test cases.
 """
+import logging
 import unittest
 import rds
 
@@ -14,7 +15,7 @@ class TestQA(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls._qa = rds.QA()
+        cls._qa = rds.QA(log_level=logging.ERROR)
 
     def test_instance_exist(self):
         self.assertTrue(self.__class__._qa.instance_exist, "Instance doesn't exist.")
