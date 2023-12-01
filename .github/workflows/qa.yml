@@ -94,7 +94,7 @@ jobs:
 
       - name: Poetry run test case
         id: poetry-run-test-case
-        run: /etc/poetry/bin/poetry run python3 rds.py || true
+        run: /etc/poetry/bin/poetry run python3 test_rds.py
         working-directory: scripts/qa
 
       - name: Send alert if job fails
