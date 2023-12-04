@@ -536,6 +536,12 @@ variable "cloudwatch_log_group_kms_key_id" {
   default     = null
 }
 
+variable "cloudwatch_log_group_skip_destroy_on_deletion" {
+  description = "Should we skip to destroy CloudWatch log group on deletion?"
+  type        = bool
+  default     = false
+}
+
 ################################################################################
 # Cluster specific variables
 ################################################################################

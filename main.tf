@@ -56,7 +56,7 @@ module "cw_log_group" {
   enabled_cw_logs_exports               = var.enabled_cloudwatch_logs_exports
   cw_log_group_retention_in_days        = var.cloudwatch_log_group_retention_in_days
   cw_log_group_kms_key_id               = var.cloudwatch_log_group_kms_key_id
-  cw_log_group_skip_destroy_on_deletion = local.cloudwatch_log_group_skip_destroy_on_deletion
+  cw_log_group_skip_destroy_on_deletion = var.cloudwatch_log_group_skip_destroy_on_deletion
 }
 
 module "enhanced_monitoring_iam_role" {
@@ -224,7 +224,7 @@ module "db_proxy" {
   db_cluster_identifier                 = var.identifier
   endpoints                             = {}
   manage_log_group                      = true
-  cw_log_group_skip_destroy_on_deletion = local.cloudwatch_log_group_skip_destroy_on_deletion
+  cw_log_group_skip_destroy_on_deletion = var.cloudwatch_log_group_skip_destroy_on_deletion
   log_group_retention_in_days           = var.cloudwatch_log_group_retention_in_days
   log_group_kms_key_id                  = var.cloudwatch_log_group_kms_key_id
   log_group_tags                        = var.tags

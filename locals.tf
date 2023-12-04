@@ -38,8 +38,7 @@ locals {
   ########################################################################
   # CloudWatch log group config
   ########################################################################
-  create_cloudwatch_log_group                   = length(var.enabled_cloudwatch_logs_exports) > 0
-  cloudwatch_log_group_skip_destroy_on_deletion = true
+  create_cloudwatch_log_group = length(var.enabled_cloudwatch_logs_exports) > 0
 
   ########################################################################
   # DB Proxy configuration
