@@ -830,9 +830,8 @@ variable "is_serverless" { # tempprary variable for testing
 # Security Group
 ################################################################################
 
-variable "vpc_id" { # TODO: include?
-  type    = string
-  default = null
+variable "vpc_id" {
+  type = string
 }
 
 variable "rds_security_group_rules" {
