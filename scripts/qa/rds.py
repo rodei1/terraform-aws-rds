@@ -44,7 +44,7 @@ class QA:
         self.session = boto3.session.Session()
         logging.debug("Class initialized")
 
-    def __get_databases(self) -> dict:
+    def __get_all_instances(self) -> dict:
         """
         Get a list of RDS Instances and return them stored inside a dictionary.
 
@@ -63,7 +63,7 @@ class QA:
         """
         instance: dict = self.instance
         if instance is None:
-            dbs: dict = self.__get_databases()
+            dbs: dict = self.__get_all_instances()
             for db in dbs["DBInstances"]:
                 if db["DBInstanceIdentifier"] == "qa":
                     self.__set_instance(db)
