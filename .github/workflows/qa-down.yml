@@ -56,9 +56,14 @@ jobs:
         run: terraform destroy -input=false -auto-approve
         working-directory: tests/qa
 
+      - name: Cleanup CloudWatch Log Groups
+        id: cloudwatch_log_groups
+        run: ./cloudwatch_log_groups.sh
+        working-directory: tests/qa
+
       - name: Send alert if job fails
         if: failure()
         uses: dfds/shared-workflows/.github/actions/automation-slack-notifier@master
         with:
           slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
-          slack_message: Spin up QA environment failed.
+          slack_message: Teardown QA environment failed.
