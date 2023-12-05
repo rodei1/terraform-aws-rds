@@ -61,7 +61,7 @@ class TestQA(unittest.TestCase):
         self.assertEqual(self.__class__._qa.get_engine_from_instance(), "postgres")
 
     def test_database_name(self):
-        self.assertEqual(self.__class__._qa.get_database_name_from_instance(), "db1")
+        self.assertEqual(self.__class__._qa.get_database_name_from_instance(), "qadb")
 
     def test_instance_class(self):
         self.assertEqual(
@@ -81,7 +81,7 @@ class TestQA(unittest.TestCase):
         self.assertTrue(self.__class__._qa.is_publicly_available())
 
     def test_is_iam_db_auth_enabled(self):
-        self.assertFalse(self.__class__._qa.is_iam_db_auth_enabled())
+        self.assertTrue(self.__class__._qa.is_iam_db_auth_enabled())
 
     def test_is_performance_insights_enabled(self):
         self.assertTrue(self.__class__._qa.is_performance_insights_enabled())
