@@ -15,6 +15,7 @@ locals {
     "dfds.automation.initiator.pipeline" = "https://github.com/dfds/aws-modules-rds/actions/workflows/qa.yml"
     "dfds.test.scope"                    = "qa"
   }
+
 }
 
 module "rds_instance_test" {
@@ -43,6 +44,18 @@ module "rds_instance_test" {
   oidc_provider                          = "oidc.eks.eu-west-1.amazonaws.com/id/B182759F93D251942CB146063F57036B"
   kubernetes_namespace                   = "cloudengineering-bluep-nvfgm"
   vpc_id                                 = "vpc-04a384af7d3657687"
+
+  proxy_security_group_rules = {
+    ingress_rules = [
+      {
+        from_port   = 5432
+        to_port     = 5432
+        protocol    = "tcp"
+        description = "PostgreSQL access from Hellman"
+        cidr_blocks = "10.0.0.0/16"
+      },
+    ]
+  }
 
   rds_security_group_rules = {
     ingress_rules = [
