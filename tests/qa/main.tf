@@ -70,15 +70,15 @@ module "rds_instance_test" {
         from_port   = 5432
         to_port     = 5432
         protocol    = "tcp"
-        description = "PostgreSQL access from public IPs"
-        cidr_blocks = "0.0.0.0/0"
+        description = "PostgreSQL access over VPC peering"
+        cidr_blocks = "10.0.0.0/16"
       },
       {
         from_port   = 5432
         to_port     = 5432
         protocol    = "tcp"
-        description = "PostgreSQL access over VPC peering"
-        cidr_blocks = "10.0.0.0/16"
+        description = "PostgreSQL access from public IPs"
+        cidr_blocks = "0.0.0.0/0"
       },
     ]
   }
