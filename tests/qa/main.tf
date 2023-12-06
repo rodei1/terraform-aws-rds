@@ -2,44 +2,60 @@ provider "aws" {
   region = local.region
 }
 
-data "aws_availability_zones" "available" {}
-
 locals {
-  name     = "qa"
-  region   = "eu-central-1"
-  vpc_cidr = "10.20.0.0/16"
-  azs      = slice(data.aws_availability_zones.available.names, 0, 3)
+  name   = "qa"
+  region = "eu-central-1"
 
   tags = {
-    Name       = local.name
-    Example    = local.name
-    Repository = "https://github.com/dfds/aws-modules-rds"
+    Name                                 = local.name
+    Repository                           = "https://github.com/dfds/aws-modules-rds"
+    "dfds.env"                           = "test"
+    "dfds.automation.tool"               = "Terraform"
+    "dfds.automation.initiator.location" = "https://github.com/dfds/aws-modules-rds/"
+    "dfds.automation.initiator.pipeline" = "https://github.com/dfds/aws-modules-rds/actions/workflows/qa.yml"
+    "dfds.test.scope"                    = "qa"
   }
+
 }
 
 module "rds_instance_test" {
   source                                 = "../../"
   identifier                             = local.name
   instance_class                         = "db.t3.micro"
-  db_name                                = "db1"
+  db_name                                = "qadb"
   multi_az                               = true
   username                               = "qa_user"
+  manage_master_user_password            = true
+  iam_database_authentication_enabled    = true
   ca_cert_identifier                     = "rds-ca-ecc384-g1"
   apply_immediately                      = true
   tags                                   = local.tags
   publicly_accessible                    = true
-  subnet_ids                             = concat(module.vpc.public_subnets)
+  subnet_ids                             = ["subnet-04d5d42ac21fd8e8f", "subnet-0e50a82dec5fc0272", "subnet-0a49d384ff2e8a580"]
   allocated_storage                      = 5
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1
-  #rds_proxy_security_group_ids           = [aws_security_group.rds_proxy_sg.id]
   include_proxy                          = true
   proxy_debug_logging                    = true
   enhanced_monitoring_interval           = 0
   allow_major_version_upgrade            = true
   engine_version                         = "16.1"
   performance_insights_enabled           = true
-  vpc_id                                 = module.vpc.vpc_id
+  oidc_provider                          = "oidc.eks.eu-west-1.amazonaws.com/id/B182759F93D251942CB146063F57036B"
+  kubernetes_namespace                   = "cloudengineering-bluep-nvfgm"
+  vpc_id                                 = "vpc-04a384af7d3657687"
+
+  proxy_security_group_rules = {
+    ingress_rules = [
+      {
+        from_port   = 5432
+        to_port     = 5432
+        protocol    = "tcp"
+        description = "PostgreSQL access over VPC peering"
+        cidr_blocks = "10.0.0.0/16"
+      },
+    ]
+  }
 
   rds_security_group_rules = {
     ingress_rules = [
@@ -48,56 +64,23 @@ module "rds_instance_test" {
         to_port     = 5432
         protocol    = "tcp"
         description = "PostgreSQL access from within VPC"
-        cidr_blocks = module.vpc.vpc_cidr_block
+        cidr_blocks = "10.100.56.0/22"
       },
       {
         from_port   = 5432
         to_port     = 5432
         protocol    = "tcp"
-        description = "PostgreSQL access from internet"
+        description = "PostgreSQL access over VPC peering"
+        cidr_blocks = "10.0.0.0/16"
+      },
+      {
+        from_port   = 5432
+        to_port     = 5432
+        protocol    = "tcp"
+        description = "PostgreSQL access from public IPs"
         cidr_blocks = "0.0.0.0/0"
       },
     ]
   }
 
-}
-
-
-################################################################################
-# Supporting Resources
-################################################################################
-
-module "vpc" {
-  source          = "terraform-aws-modules/vpc/aws"
-  version         = "~> 5.0"
-  name            = local.name
-  cidr            = local.vpc_cidr
-  azs             = local.azs
-  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
-  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 3)]
-  tags            = local.tags
-}
-
-
-resource "aws_security_group" "rds_proxy_sg" {
-  name        = "rds-proxy-${local.name}"
-  description = "A security group for ${local.name} database proxy"
-  vpc_id      = module.vpc.vpc_id
-  tags        = local.tags
-
-  # Proxy requires self referencing inbound rule
-  ingress {
-    from_port = 5432
-    to_port   = 5432
-    protocol  = "tcp"
-    self      = true
-  }
-
-  # Allow outbound all traffic
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
