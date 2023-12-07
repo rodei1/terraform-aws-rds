@@ -41,7 +41,7 @@ module "db_parameter_group" {
 
 module "db_subnet_group" {
   source          = "./modules/rds_subnet_group"
-  count           = local.create_db_subnet_group ? 1 : 0
+  count           = var.create_db_subnet_group ? 1 : 0
   name            = coalesce(var.db_subnet_group_name, var.identifier)
   use_name_prefix = var.db_subnet_group_use_name_prefix
   description     = var.db_subnet_group_description
@@ -69,35 +69,31 @@ module "enhanced_monitoring_iam_role" {
 }
 
 module "db_instance" {
-  source                                = "./modules/rds_instance"
-  count                                 = !var.is_db_cluster && !local.is_serverless ? 1 : 0
-  identifier                            = var.identifier
-  use_identifier_prefix                 = var.instance_use_identifier_prefix
-  engine                                = local.engine
-  engine_version                        = local.engine_version
-  instance_class                        = var.instance_class
-  allocated_storage                     = local.storage_size
-  storage_type                          = local.storage_type
-  storage_encrypted                     = var.storage_encrypted
-  kms_key_id                            = var.kms_key_id
-  license_model                         = var.license_model
+  source = "./modules/rds_instance"
+  count  = var.create_db_instance ? 1 : 0
+
+  identifier            = var.identifier
+  use_identifier_prefix = var.instance_use_identifier_prefix
+  engine                = var.engine
+  engine_version        = local.engine_version
+  instance_class        = local.instance_class
+  allocated_storage     = local.allocated_storage
+  max_allocated_storage = local.max_allocated_storage
+  storage_type          = var.storage_type
+  storage_encrypted     = true
+
   db_name                               = var.db_name
   username                              = var.username
   password                              = local.password
-  port                                  = var.port
-  domain                                = var.domain
-  domain_iam_role_name                  = var.domain_iam_role_name
+  port                                  = local.port
   iam_database_authentication_enabled   = var.iam_database_authentication_enabled
-  custom_iam_instance_profile           = var.custom_iam_instance_profile
   manage_master_user_password           = var.manage_master_user_password
-  master_user_secret_kms_key_id         = var.master_user_secret_kms_key_id
   vpc_security_group_ids                = [module.security_group.security_group_id]
   db_subnet_group_name                  = local.db_subnet_group_name
   parameter_group_name                  = module.db_parameter_group[0].db_parameter_group_id
-  option_group_name                     = null # Not supported in postgresql
   network_type                          = var.network_type
   availability_zone                     = var.availability_zone
-  multi_az                              = var.multi_az
+  multi_az                              = local.multi_az
   iops                                  = var.iops
   storage_throughput                    = var.storage_throughput
   publicly_accessible                   = var.publicly_accessible
@@ -106,29 +102,18 @@ module "db_instance" {
   auto_minor_version_upgrade            = var.auto_minor_version_upgrade
   apply_immediately                     = var.apply_immediately
   maintenance_window                    = var.maintenance_window
-  blue_green_update                     = var.blue_green_update
-  snapshot_identifier                   = var.snapshot_identifier
   copy_tags_to_snapshot                 = var.copy_tags_to_snapshot
-  skip_final_snapshot                   = var.skip_final_snapshot
+  skip_final_snapshot                   = local.skip_final_snapshot
   final_snapshot_identifier_prefix      = var.final_snapshot_identifier_prefix
-  performance_insights_enabled          = var.performance_insights_enabled
-  performance_insights_retention_period = var.performance_insights_retention_period
-  performance_insights_kms_key_id       = var.performance_insights_enabled ? var.performance_insights_kms_key_id : null
-  replicate_source_db                   = var.replicate_source_db
-  replica_mode                          = var.replica_mode
+  performance_insights_enabled          = local.performance_insights_enabled
+  performance_insights_retention_period = local.performance_insights_retention_period
   backup_retention_period               = local.backup_retention_period
   backup_window                         = var.backup_window
-  max_allocated_storage                 = var.max_allocated_storage
   monitoring_interval                   = var.enhanced_monitoring_interval
   monitoring_role_arn                   = local.monitoring_role_arn
-  character_set_name                    = var.character_set_name
-  nchar_character_set_name              = var.nchar_character_set_name
-  timezone                              = var.timezone
   timeouts                              = var.timeouts
   deletion_protection                   = var.deletion_protection
-  delete_automated_backups              = var.delete_automated_backups
-  restore_to_point_in_time              = var.restore_to_point_in_time
-  s3_import                             = var.s3_import
+  delete_automated_backups              = local.delete_automated_backups
   enabled_cloudwatch_logs_exports       = var.enabled_cloudwatch_logs_exports
   oidc_provider                         = var.oidc_provider
   kubernetes_namespace                  = var.kubernetes_namespace
@@ -149,11 +134,11 @@ module "db_multi_az_cluster" {
   count                           = var.is_db_cluster && !local.is_serverless ? 1 : 0
   name                            = var.identifier
   cluster_use_name_prefix         = var.cluster_use_name_prefix
-  engine                          = local.engine
+  engine                          = var.engine
   engine_version                  = local.engine_version
   db_subnet_group_name            = local.db_subnet_group_name
-  storage_type                    = local.storage_type
-  allocated_storage               = local.storage_size
+  storage_type                    = var.storage_type
+  allocated_storage               = local.allocated_storage
   iops                            = local.iops
   backup_retention_period         = null # Backup is managed by the organization
   db_cluster_instance_class       = var.instance_class
