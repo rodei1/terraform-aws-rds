@@ -148,6 +148,21 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
+data "aws_iam_policy_document" "discovery" {
+  statement {
+    sid       = "DiscoverInstances"
+    effect    = "Allow"
+    resources = ["arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:*"]
+    actions   = ["rds:DescribeDBInstances"]
+  }
+  statement {
+    sid       = "DiscoverProxies"
+    effect    = "Allow"
+    resources = ["arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db-proxy:*"]
+    actions   = ["rds:DescribeDBProxies"]
+  }
+}
+
 data "aws_iam_policy_document" "connect" {
   statement {
     sid       = "Connect"
@@ -250,6 +265,11 @@ data "aws_iam_policy_document" "services" {
   }
 }
 
+resource "aws_iam_policy" "discovery" {
+  name   = "${aws_db_instance.this.identifier}-discovery"
+  policy = data.aws_iam_policy_document.discovery.json
+}
+
 resource "aws_iam_policy" "connect" {
   name   = "${aws_db_instance.this.identifier}-connect"
   policy = data.aws_iam_policy_document.connect.json
@@ -264,7 +284,7 @@ resource "aws_iam_role" "access_from_kubernetes" {
   count               = local.kubernetes_namespace == "none" || local.oidc_provider == "none" ? 0 : 1
   name                = "${aws_db_instance.this.identifier}-for-kubernetes"
   assume_role_policy  = data.aws_iam_policy_document.kubernetes.json
-  managed_policy_arns = [aws_iam_policy.connect.arn, aws_iam_policy.secretsmanager.arn]
+  managed_policy_arns = [aws_iam_policy.connect.arn, aws_iam_policy.secretsmanager.arn, aws_iam_policy.discovery.arn]
 }
 
 resource "aws_iam_role" "access_from_aws" {
