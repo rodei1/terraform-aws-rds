@@ -103,3 +103,14 @@ jobs:
         with:
           slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
           slack_message: Test QA environment failed.
+
+  release:
+    runs-on: ubuntu-latest
+    needs: qa-up
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: rymndhng/release-on-push-action@master
+        with:
+          bump_version_scheme: patch
+          tag_prefix: ""
