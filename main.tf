@@ -249,8 +249,8 @@ module "security_group_proxy" {
   vpc_id                   = var.vpc_id
   ingress_with_cidr_blocks = var.proxy_security_group_rules.ingress_rules
   ingress_with_self = concat([{
-    from_port = 5432
-    to_port   = 5432
+    from_port = var.port
+    to_port   = var.port
     protocol  = "tcp"
     description = "PostgreSQL access from within Security Gruop" }],
   var.proxy_security_group_rules.ingress_with_self)
@@ -261,5 +261,13 @@ module "security_group_proxy" {
     description = "Allow all outbound traffic"
     cidr_blocks = "0.0.0.0/0"
   }]
+  egress_with_source_security_group_id = [{
+    source_security_group_id = module.security_group.security_group_id
+    from_port                = var.port
+    to_port                  = var.port
+    protocol                 = "-1"
+    description              = "Allow outbound traffic to PostgreSQL instance"
+    }
+  ]
   tags = var.tags
 }
