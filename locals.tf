@@ -64,7 +64,7 @@ locals {
   config = {
     postgres = {
       prod = {
-        instance_class                        = "db.t3.small",
+        instance_class                        = "db.t3.micro",
         max_allocated_storage                 = 50,
         port                                  = 5432,
         multi_az                              = true,
