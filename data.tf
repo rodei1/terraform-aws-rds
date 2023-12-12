@@ -1,5 +1,4 @@
-data "aws_rds_engine_version" "engine_info" { # preferred vesion
+data "aws_rds_engine_version" "default" {
   engine       = local.engine
-  version      = var.engine_version
-  default_only = !local.is_major_engine_version || var.engine_version == null
+  default_only = true
 }

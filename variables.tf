@@ -4,6 +4,15 @@
 # Instance specific variables - applicable to cluster instances as well
 ################################################################################
 
+variable "environment" {
+  description = "The environment"
+  type        = string
+  validation {
+    condition     = contains(["dev", "test", "staging", "uat", "training", "prod"], var.environment)
+    error_message = "Valid values for environment are: dev, test,staging, uat, training, prod."
+  }
+}
+
 variable "identifier" {
   description = "The name of the RDS instance"
   type        = string
@@ -15,12 +24,6 @@ variable "instance_use_identifier_prefix" {
   default     = false
 }
 
-variable "custom_iam_instance_profile" {
-  description = "RDS custom iam instance profile"
-  type        = string
-  default     = null
-}
-
 variable "allocated_storage" {
   description = "The allocated storage in gigabytes"
   type        = number
@@ -30,8 +33,7 @@ variable "allocated_storage" {
 variable "storage_type" {
   description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), or 'io1' (provisioned IOPS SSD). The default is 'io1' if iops is specified, 'gp2' if not. If you specify 'io1' or 'gp3' , you must also include a value for the 'iops' parameter"
   type        = string
-  # default     = null
-  default = "gp2"
+  default     = "gp3"
 }
 
 variable "storage_throughput" {
@@ -122,6 +124,10 @@ variable "instance_class" {
   description = "The instance type of the RDS instance"
   type        = string
   default     = ""
+  validation {
+    condition     = contains(["", "db.t3.micro", "db.t3.small", "db.t3.medium", "db.t3.large", "db.t3.xlarge", "db.t3.2xlarge", "db.r6g.xlarge", "db.m6g.large", "db.m6g.xlarge", "db.t2.micro", "db.t2.small", "db.t2.medium", "db.m4.large", "db.m5d.large", "db.m6i.large", "db.m5.xlarge", "db.t4g.micro", "db.t4g.small", "db.t4g.large", "db.t4g.xlarge"], var.instance_class)
+    error_message = "The instance type is not allowed."
+  }
 }
 
 variable "db_name" {
@@ -248,7 +254,7 @@ variable "enhanced_monitoring_iam_role_path" {
 variable "allow_major_version_upgrade" {
   description = "Indicates that major version upgrades are allowed. Changing this parameter does not result in an outage and the change is asynchronously applied as soon as possible"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "auto_minor_version_upgrade" {
@@ -323,6 +329,12 @@ variable "db_parameter_group_tags" {
   description = "Additional tags for the  DB parameter group"
   type        = map(string)
   default     = {}
+}
+
+variable "create_db_subnet_group" {
+  description = "Whether to create a DB subnet group"
+  type        = bool
+  default     = true
 }
 
 variable "db_subnet_group_tags" {
@@ -462,19 +474,19 @@ variable "option_group_timeouts" {
 variable "deletion_protection" {
   description = "The database can't be deleted when this value is set to true"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "performance_insights_enabled" {
   description = "Specifies whether Performance Insights are enabled"
   type        = bool
-  default     = false
+  default     = null
 }
 
 variable "performance_insights_retention_period" {
   description = "The amount of time in days to retain Performance Insights data. Valid values are `7`, `731` (2 years) or a multiple of `31`"
   type        = number
-  default     = 7
+  default     = null
 }
 
 variable "performance_insights_kms_key_id" {
