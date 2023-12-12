@@ -24,12 +24,6 @@ variable "instance_use_identifier_prefix" {
   default     = false
 }
 
-variable "engine" {
-  description = "The database engine to use. Currently, the template supports only `postgres` engine"
-  type        = string
-  default     = "postgres"
-}
-
 variable "allocated_storage" {
   description = "The allocated storage in gigabytes"
   type        = number

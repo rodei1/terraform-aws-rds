@@ -74,7 +74,7 @@ module "db_instance" {
 
   identifier            = var.identifier
   use_identifier_prefix = var.instance_use_identifier_prefix
-  engine                = var.engine
+  engine                = local.engine
   engine_version        = local.engine_version
   instance_class        = local.instance_class
   allocated_storage     = local.allocated_storage
@@ -134,7 +134,7 @@ module "db_multi_az_cluster" {
   count                           = var.is_db_cluster && !local.is_serverless ? 1 : 0
   name                            = var.identifier
   cluster_use_name_prefix         = var.cluster_use_name_prefix
-  engine                          = var.engine
+  engine                          = local.engine
   engine_version                  = local.engine_version
   db_subnet_group_name            = local.db_subnet_group_name
   storage_type                    = var.storage_type

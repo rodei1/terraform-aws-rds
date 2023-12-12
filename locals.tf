@@ -61,35 +61,35 @@ locals {
   is_serverless             = var.is_serverless                                               # temporary controlled by variable. TODO: Replace by calculation
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.final_snapshot_identifier_prefix}-${var.identifier}-${try(random_id.snapshot_identifier[0].hex, "")}"
 
+  engine = "postgres"
+
   config = {
-    postgres = {
-      prod = {
-        instance_class                        = "db.t3.micro",
-        max_allocated_storage                 = 50,
-        port                                  = 5432,
-        multi_az                              = true,
-        skip_final_snapshot                   = false,
-        performance_insights_enabled          = true,
-        performance_insights_retention_period = 7,
-        delete_automated_backups              = false
-      },
-      non-prod = {
-        instance_class                        = "db.t3.micro",
-        allocated_storage                     = 20,
-        max_allocated_storage                 = null
-        port                                  = 5432,
-        multi_az                              = true,
-        skip_final_snapshot                   = true,
-        performance_insights_enabled          = false,
-        performance_insights_retention_period = null,
-        delete_automated_backups              = true
+    prod = {
+      instance_class                        = "db.t3.micro",
+      max_allocated_storage                 = 50,
+      port                                  = 5432,
+      multi_az                              = true,
+      skip_final_snapshot                   = false,
+      performance_insights_enabled          = true,
+      performance_insights_retention_period = 7,
+      delete_automated_backups              = false
+    },
+    non-prod = {
+      instance_class                        = "db.t3.micro",
+      allocated_storage                     = 20,
+      max_allocated_storage                 = null
+      port                                  = 5432,
+      multi_az                              = true,
+      skip_final_snapshot                   = true,
+      performance_insights_enabled          = false,
+      performance_insights_retention_period = null,
+      delete_automated_backups              = true
       }
-    }
   }
 
   engine_version                        = var.engine_version != null ? var.engine_version : floor(data.aws_rds_engine_version.default.version)
   environment                           = var.environment == "prod" ? var.environment : "non-prod"
-  default_config                        = local.config[var.engine][local.environment]
+  default_config                        = local.config[local.environment]
   instance_class                        = var.instance_class != "" ? var.instance_class : local.default_config.instance_class
   allocated_storage                     = var.allocated_storage != null ? var.allocated_storage : local.default_config.allocated_storage
   max_allocated_storage                 = var.max_allocated_storage != null ? var.max_allocated_storage : local.default_config.max_allocated_storage

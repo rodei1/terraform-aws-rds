@@ -1,4 +1,4 @@
 data "aws_rds_engine_version" "default" {
-  engine       = var.engine
+  engine       = local.engine
   default_only = true
 }
