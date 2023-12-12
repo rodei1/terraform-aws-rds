@@ -44,6 +44,7 @@ module "rds_instance_test" {
   oidc_provider                          = "oidc.eks.eu-west-1.amazonaws.com/id/B182759F93D251942CB146063F57036B"
   kubernetes_namespace                   = "cloudengineering-bluep-nvfgm"
   vpc_id                                 = "vpc-04a384af7d3657687"
+  deletion_protection                    = false
 
   proxy_security_group_rules = {
     ingress_rules = [

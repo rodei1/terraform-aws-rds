@@ -44,10 +44,10 @@ class TestQA(unittest.TestCase):
         self.assertEqual(self.__class__._qa.get_username_from_instance(), "qa_user")
 
     def test_storage_size(self):
-        self.assertEqual(self.__class__._qa.get_storage_size_from_instance(), 5)
+        self.assertEqual(self.__class__._qa.get_storage_size_from_instance(), 20)
 
     def test_storage_type(self):
-        self.assertEqual(self.__class__._qa.get_storage_type_from_instance(), "gp2")
+        self.assertEqual(self.__class__._qa.get_storage_type_from_instance(), "gp3")
 
     def test_is_storage_encrypted(self):
         self.assertTrue(
