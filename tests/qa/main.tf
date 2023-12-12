@@ -21,6 +21,7 @@ locals {
 module "rds_instance_test" {
   source                                 = "../../"
   identifier                             = local.name
+  environment                            = "test"
   instance_class                         = "db.t3.micro"
   db_name                                = "qadb"
   multi_az                               = true
