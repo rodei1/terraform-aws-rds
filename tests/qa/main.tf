@@ -33,7 +33,6 @@ module "rds_instance_test" {
   tags                                   = local.tags
   publicly_accessible                    = true
   subnet_ids                             = ["subnet-04d5d42ac21fd8e8f", "subnet-0e50a82dec5fc0272", "subnet-0a49d384ff2e8a580"]
-  allocated_storage                      = 5
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1
   include_proxy                          = true
