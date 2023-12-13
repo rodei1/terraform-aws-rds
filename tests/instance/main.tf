@@ -33,12 +33,12 @@ module "rds_instance_test" {
   subnet_ids                             = concat(module.vpc.public_subnets)
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1
-  include_proxy                          = true
+  include_proxy                          = false
   proxy_debug_logging                    = true
   enhanced_monitoring_interval           = 0
   allow_major_version_upgrade            = true
-  engine_version                         = "15.4"
-  performance_insights_enabled           = true
+  # engine_version                         = "15.4"
+  performance_insights_enabled = true
 
   # Group variables into maps
   vpc_id = module.vpc.vpc_id
@@ -60,6 +60,7 @@ module "rds_instance_test" {
       },
     ]
   }
+  environment = "dev"
 }
 
 ################################################################################

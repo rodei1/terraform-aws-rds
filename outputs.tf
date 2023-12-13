@@ -36,5 +36,5 @@ output "iam_instance_profile_for_ec2" {
 
 output "instance_engine_info" {
   description = "The engine info for the selected engine of the RDS instance"
-  value       = jsonencode(data.aws_rds_engine_version.default)
+  value       = jsonencode(data.aws_rds_engine_version.engine_info)
 }

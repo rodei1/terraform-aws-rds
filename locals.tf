@@ -4,7 +4,7 @@ locals {
   # Parameter group
   ########################################################################
   create_db_parameter_group = true
-  parameter_group_family    = data.aws_rds_engine_version.default.parameter_group_family
+  parameter_group_family    = data.aws_rds_engine_version.engine_info.parameter_group_family
 
   instance_parameters = concat([
     {
@@ -84,10 +84,12 @@ locals {
       performance_insights_enabled          = false,
       performance_insights_retention_period = null,
       delete_automated_backups              = true
-      }
+    }
   }
 
-  engine_version                        = var.engine_version != null ? var.engine_version : floor(data.aws_rds_engine_version.default.version)
+  # engine_version                        = var.engine_version != null ? var.engine_version : floor(data.aws_rds_engine_version.default.version)
+  engine_version                        = data.aws_rds_engine_version.engine_info.version
+  is_major_engine_version               = try(length(regexall("\\.[0-9]+$", var.engine_version)) > 0, true) # For example, 15 is a major version, but 15.5 is not
   environment                           = var.environment == "prod" ? var.environment : "non-prod"
   default_config                        = local.config[local.environment]
   instance_class                        = var.instance_class != "" ? var.instance_class : local.default_config.instance_class
