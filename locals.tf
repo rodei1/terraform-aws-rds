@@ -6,13 +6,24 @@ locals {
   create_db_parameter_group = true
   parameter_group_family    = data.aws_rds_engine_version.engine_info.parameter_group_family
 
+  prod_instance_parameters = var.environment == "prod" ? [
+    {
+      name         = "log_connections"
+      value        = 1
+      apply_method = "immediate"
+    }
+  ] : []
+
   instance_parameters = concat([
     {
-      "name"         = "rds.force_ssl"
-      "value"        = 1 # this might need to be changed back and forth to ensure apply_method is applied. See here: https://github.com/hashicorp/terraform-provider-aws/pull/24737
-      "apply_method" = "immediate"
-    }]
-  , var.instance_parameters)
+      name         = "rds.force_ssl"
+      value        = 1 # this might need to be changed back and forth to ensure apply_method is applied. See here: https://github.com/hashicorp/terraform-provider-aws/pull/24737
+      apply_method = "immediate"
+    }
+  ],
+    var.instance_parameters,
+    local.prod_instance_parameters
+  )
 
   cluster_parameters = concat([
     {
