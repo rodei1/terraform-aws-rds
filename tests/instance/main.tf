@@ -13,8 +13,7 @@ locals {
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   tags = {
-    Example    = local.name
-    Repository = "https://github.com/dfds/aws-modules-rds"
+    "dfds.automation.tool" = "Terraform"
   }
 }
 
@@ -27,9 +26,8 @@ module "rds_instance_test" {
   username                               = "instance_user"
   ca_cert_identifier                     = "rds-ca-ecc384-g1"
   apply_immediately                      = true
-  tags                                   = local.tags
   publicly_accessible                    = true
-  allocated_storage                      = 5
+  allocated_storage                      = 20
   subnet_ids                             = concat(module.vpc.public_subnets)
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1
@@ -60,7 +58,13 @@ module "rds_instance_test" {
       },
     ]
   }
-  environment = "dev"
+  environment                  = "dev"
+  service_availability         = "low"
+  resource_owner_contact_email = "example@dfds.com"
+  cost_centre                  = "buarch-d"
+  data_classification          = "public"
+  enable_default_backup        = true
+  optional_tags                = local.tags
 }
 
 ################################################################################

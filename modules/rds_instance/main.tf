@@ -123,7 +123,7 @@ resource "aws_db_instance" "this" {
     }
   }
 
-  tags = var.tags
+  tags = merge(var.tags, var.rds_tags)
 
   timeouts {
     create = lookup(var.timeouts, "create", null)

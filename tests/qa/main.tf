@@ -9,7 +9,6 @@ locals {
   tags = {
     Name                                 = local.name
     Repository                           = "https://github.com/dfds/aws-modules-rds"
-    "dfds.env"                           = "test"
     "dfds.automation.tool"               = "Terraform"
     "dfds.automation.initiator.location" = "https://github.com/dfds/aws-modules-rds/"
     "dfds.automation.initiator.pipeline" = "https://github.com/dfds/aws-modules-rds/actions/workflows/qa.yml"
@@ -30,7 +29,6 @@ module "rds_instance_test" {
   iam_database_authentication_enabled    = true
   ca_cert_identifier                     = "rds-ca-ecc384-g1"
   apply_immediately                      = true
-  tags                                   = local.tags
   publicly_accessible                    = true
   subnet_ids                             = ["subnet-04d5d42ac21fd8e8f", "subnet-0e50a82dec5fc0272", "subnet-0a49d384ff2e8a580"]
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
@@ -45,6 +43,12 @@ module "rds_instance_test" {
   kubernetes_namespace                   = "cloudengineering-bluep-nvfgm"
   vpc_id                                 = "vpc-04a384af7d3657687"
   deletion_protection                    = false
+  service_availability                   = "low"
+  resource_owner_contact_email           = "example@dfds.com"
+  cost_centre                            = "ti-arch"
+  data_classification                    = "public"
+  enable_default_backup                  = false
+  optional_tags                          = local.tags
 
   proxy_security_group_rules = {
     ingress_rules = [

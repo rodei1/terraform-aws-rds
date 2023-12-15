@@ -269,7 +269,7 @@ variable "apply_immediately" {
   default     = false
 }
 
-variable "maintenance_window" {
+variable "maintenance_window" { # TODO: Need validation. Use regex?
   description = "The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00'"
   type        = string
   default     = "Sat:18:00-Sat:20:00" # This is adjusted in accordance with AWS Backup schedule, see info here: https://wiki.dfds.cloud/en/playbooks/aws-backup/aws-backup-getting-started
@@ -283,13 +283,13 @@ variable "blue_green_update" {
   default     = {}
 }
 
-variable "backup_retention_period" {
+variable "backup_retention_period" { # TODO: Delete
   description = "The days to retain backups for"
   type        = number
   default     = null
 }
 
-variable "backup_window" {
+variable "backup_window" { # TODO: Delete
   description = "The daily time range (in UTC) during which automated backups are created if they are enabled. Example: '09:46-10:16'. Must not overlap with maintenance_window"
   type        = string
   default     = null
@@ -307,40 +307,10 @@ variable "s3_import" {
   default     = null
 }
 
-variable "tags" {
-  description = "A mapping of tags to assign to all resources"
-  type        = map(string)
-  default     = {}
-}
-
-variable "db_instance_tags" {
-  description = "Additional tags for the DB instance"
-  type        = map(string)
-  default     = {}
-}
-
-variable "db_option_group_tags" {
-  description = "Additional tags for the DB option group"
-  type        = map(string)
-  default     = {}
-}
-
-variable "db_parameter_group_tags" {
-  description = "Additional tags for the  DB parameter group"
-  type        = map(string)
-  default     = {}
-}
-
 variable "create_db_subnet_group" {
   description = "Whether to create a DB subnet group"
   type        = bool
   default     = true
-}
-
-variable "db_subnet_group_tags" {
-  description = "Additional tags for the DB subnet group"
-  type        = map(string)
-  default     = {}
 }
 
 variable "db_subnet_group_name" {
@@ -641,12 +611,6 @@ variable "cluster_source_region" {
   default     = null
 }
 
-variable "cluster_tags" { # TODO: Do we need this?
-  description = "A map of tags to add to only the cluster. Used for AWS Instance Scheduler tagging"
-  type        = map(string)
-  default     = {}
-}
-
 variable "cluster_timeouts" {
   description = "Create, update, and delete timeout configurations for the cluster"
   type        = map(string)
@@ -874,4 +838,73 @@ variable "kubernetes_namespace" {
   description = "The namespace used for IAM Role for ServiceAccount authentication from Kubernetes"
   type        = string
   default     = null
+}
+
+
+################################################################################
+# Resource tagging
+################################################################################
+
+variable "resource_owner_contact_email" {
+  description = "Sets the dfds.owner tag"
+  type        = string
+  validation {
+    condition     = var.resource_owner_contact_email != null && can(regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", var.resource_owner_contact_email))
+    error_message = "Invalid value for var.resource_owner_contact_email. Must be a valid email address."
+  }
+}
+
+variable "cost_centre" {
+  description = "Sets the dfds.cost_centre tag. See recommendations here: https://wiki.dfds.cloud/en/playbooks/standards/tagging_policy"
+  type        = string
+}
+
+variable "enable_default_backup" {
+  description = "Sets the dfds.data.backup tag to true on non-prod resources. Tag is set to true for prod and false for non-prod. Default backup retention is 30 days Point-in-time. More info here https://wiki.dfds.cloud/en/playbooks/standards/tagging_policy"
+  type        = bool
+  default     = null
+}
+
+variable "additional_backup_retention" {
+  description = "Sets the dfds.data.backup_retention tag to the specified value. See recommendations here: https://wiki.dfds.cloud/en/playbooks/standards/tagging_policy. For additional info on how backup works see https://wiki.dfds.cloud/en/playbooks/aws-backup/aws-backup-getting-started"
+  type        = string
+  default     = ""
+  validation {
+    condition     = contains(["", "30days", "60days", "180days", "1year", "10year"], var.additional_backup_retention)
+    error_message = "Invalid value for var.additional_backup_retention. Supported values: 30days, 60days, 180days, 1year, 10year."
+  }
+}
+
+variable "data_classification" {
+  description = "Sets the dfds.data.classification tag to the specified value. See recommendations here: https://wiki.dfds.cloud/en/playbooks/standards/tagging_policy"
+  type        = string
+  validation {
+    condition     = contains(["public", "private", "confidential", "restricted"], var.data_classification)
+    error_message = "Invalid value for var.data_classification. Supported values: public, private, confidential, restricted."
+  }
+}
+
+variable "service_availability" {
+  description = "Sets the dfds.service.availability tag to the specified value. See recommendations here: https://wiki.dfds.cloud/en/playbooks/standards/tagging_policy"
+  type        = string
+  validation {
+    condition     = contains(["low", "medium", "high"], var.service_availability)
+    error_message = "Invalid value for var.service_availability. Supported values: low, medium, high."
+  }
+}
+
+variable "optional_data_specific_tags" {
+  description = <<EOF
+    Provide list of tags that are prefixed with dfds.data.* tags on data resources.
+    Use this variable to ensure that they get applied on the relevant data resources. See here for recommended and opitonal tags: https://wiki.dfds.cloud/en/playbooks/standards/tagging_policy.
+    Note: Required tags are supplied through dedicated variables.
+EOF
+  type        = map(string)
+  default     = {}
+}
+
+variable "optional_tags" {
+  description = "Sets the dfds.* tags on all resources"
+  type        = map(string)
+  default     = {}
 }

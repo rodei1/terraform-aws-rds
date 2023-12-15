@@ -36,7 +36,7 @@ module "db_parameter_group" {
   description     = var.parameter_group_description
   family          = local.parameter_group_family
   parameters      = local.instance_parameters
-  tags            = merge(var.tags, var.db_parameter_group_tags)
+  tags            = local.all_tags
 }
 
 module "db_subnet_group" {
@@ -46,7 +46,7 @@ module "db_subnet_group" {
   use_name_prefix = var.db_subnet_group_use_name_prefix
   description     = var.db_subnet_group_description
   subnet_ids      = var.subnet_ids
-  tags            = merge(var.tags, var.db_subnet_group_tags)
+  tags            = local.all_tags
 }
 
 module "cw_log_group" {
@@ -57,6 +57,7 @@ module "cw_log_group" {
   cw_log_group_retention_in_days        = var.cloudwatch_log_group_retention_in_days
   cw_log_group_kms_key_id               = var.cloudwatch_log_group_kms_key_id
   cw_log_group_skip_destroy_on_deletion = var.cloudwatch_log_group_skip_destroy_on_deletion
+  tags                                  = local.all_tags
 }
 
 module "enhanced_monitoring_iam_role" {
@@ -66,22 +67,21 @@ module "enhanced_monitoring_iam_role" {
   monitoring_role_use_name_prefix      = var.enhanced_monitoring_role_use_name_prefix
   monitoring_role_description          = local.monitoring_role_description
   monitoring_role_permissions_boundary = var.enhanced_monitoring_role_permissions_boundary
+  tags                                 = local.all_tags
 }
 
 module "db_instance" {
-  source = "./modules/rds_instance"
-  count  = var.create_db_instance ? 1 : 0
-
-  identifier            = var.identifier
-  use_identifier_prefix = var.instance_use_identifier_prefix
-  engine                = local.engine
-  engine_version        = local.engine_version
-  instance_class        = local.instance_class
-  allocated_storage     = local.allocated_storage
-  max_allocated_storage = local.max_allocated_storage
-  storage_type          = var.storage_type
-  storage_encrypted     = true
-
+  source                                = "./modules/rds_instance"
+  count                                 = var.create_db_instance ? 1 : 0
+  identifier                            = var.identifier
+  use_identifier_prefix                 = var.instance_use_identifier_prefix
+  engine                                = local.engine
+  engine_version                        = local.engine_version
+  instance_class                        = local.instance_class
+  allocated_storage                     = local.allocated_storage
+  max_allocated_storage                 = local.max_allocated_storage
+  storage_type                          = var.storage_type
+  storage_encrypted                     = true
   db_name                               = var.db_name
   username                              = var.username
   password                              = local.password
@@ -117,7 +117,8 @@ module "db_instance" {
   enabled_cloudwatch_logs_exports       = var.enabled_cloudwatch_logs_exports
   oidc_provider                         = var.oidc_provider
   kubernetes_namespace                  = var.kubernetes_namespace
-  tags                                  = merge(var.tags, var.db_instance_tags)
+  tags                                  = local.all_tags
+  rds_tags                              = local.data_tags
 }
 
 module "cluster_parameters" {
@@ -151,7 +152,7 @@ module "db_multi_az_cluster" {
   vpc_security_group_ids          = var.vpc_security_group_ids
   skip_final_snapshot             = var.skip_final_snapshot
   enabled_cloudwatch_logs_exports = var.enabled_cloudwatch_logs_exports
-  tags                            = merge(var.tags, var.db_instance_tags)
+  tags                            = local.all_tags # might also need to add rds_tags
 
 }
 
@@ -173,8 +174,8 @@ module "db_cluster_serverless" { # TODO: Revisit defaults
   apply_immediately           = var.apply_immediately
   skip_final_snapshot         = var.skip_final_snapshot
   instance_class              = "db.serverless"
-  tags                        = var.tags
-  serverlessv2_scaling_configuration = { # TODO: Turn values into default in the variable
+  tags                        = local.all_tags # might also need to add rds_tags
+  serverlessv2_scaling_configuration = {       # TODO: Turn values into default in the variable
     min_capacity = 2
     max_capacity = 5
   }
@@ -187,7 +188,7 @@ module "db_cluster_serverless" { # TODO: Revisit defaults
 module "db_proxy" {
   source                                = "./modules/rds_proxy"
   count                                 = var.include_proxy ? 1 : 0
-  tags                                  = var.tags
+  tags                                  = local.all_tags
   name                                  = var.identifier
   auth                                  = local.proxy_auth_config
   debug_logging                         = var.proxy_debug_logging
@@ -197,7 +198,7 @@ module "db_proxy" {
   role_arn                              = try(module.db_instance[0].iam_role_for_aws_services.arn, module.db_cluster_serverless[0].iam_role_for_aws_services.arn, null) # TODO: Fix iam_role_for_aws_services for db_cluster_serverless by adding required IAM resources
   vpc_security_group_ids                = [module.security_group_proxy[0].security_group_id]
   vpc_subnet_ids                        = var.subnet_ids
-  proxy_tags                            = var.tags
+  proxy_tags                            = local.all_tags
   connection_borrow_timeout             = null
   init_query                            = null
   max_connections_percent               = 100
@@ -212,7 +213,7 @@ module "db_proxy" {
   cw_log_group_skip_destroy_on_deletion = var.cloudwatch_log_group_skip_destroy_on_deletion
   log_group_retention_in_days           = var.cloudwatch_log_group_retention_in_days
   log_group_kms_key_id                  = var.cloudwatch_log_group_kms_key_id
-  log_group_tags                        = var.tags
+  log_group_tags                        = local.all_tags
 
 }
 
@@ -223,7 +224,7 @@ module "security_group" { # TODO: update with another rule for public access
   vpc_id                   = var.vpc_id
   ingress_with_cidr_blocks = var.rds_security_group_rules.ingress_rules
   ingress_with_self        = var.rds_security_group_rules.ingress_with_self
-  tags                     = var.tags
+  tags                     = local.all_tags
 }
 
 module "security_group_proxy" {
@@ -254,5 +255,5 @@ module "security_group_proxy" {
     description              = "Allow outbound traffic to PostgreSQL instance"
     }
   ]
-  tags = var.tags
+  tags = local.all_tags
 }

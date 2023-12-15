@@ -257,6 +257,12 @@ variable "backup_window" {
   default     = null
 }
 
+variable "rds_tags" {
+  description = "A mapping of tags to assign to the DB instances only."
+  type        = map(string)
+  default     = {}
+}
+
 variable "tags" {
   description = "A mapping of tags to assign to all resources"
   type        = map(string)
