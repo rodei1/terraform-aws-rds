@@ -19,24 +19,20 @@ locals {
 
 module "rds_instance_test" {
   source     = "../../"
+  create_db_instance = true
   identifier = local.name
 
-  instance_class                         = "db.t3.micro"
-  multi_az                               = true
+
   username                               = "instance_user"
-  ca_cert_identifier                     = "rds-ca-ecc384-g1"
+
   apply_immediately                      = true
   publicly_accessible                    = true
-  allocated_storage                      = 20
+
   subnet_ids                             = concat(module.vpc.public_subnets)
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1
   include_proxy                          = false
   proxy_debug_logging                    = true
-  enhanced_monitoring_interval           = 0
-  allow_major_version_upgrade            = true
-  # engine_version                         = "15.4"
-  performance_insights_enabled = true
 
   # Group variables into maps
   vpc_id = module.vpc.vpc_id
