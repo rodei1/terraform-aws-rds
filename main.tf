@@ -108,7 +108,7 @@ module "db_instance" {
   performance_insights_enabled          = local.performance_insights_enabled
   performance_insights_retention_period = local.performance_insights_retention_period
   backup_retention_period               = local.backup_retention_period
-  backup_window                         = var.backup_window
+  backup_window                         = local.backup_window
   monitoring_interval                   = var.enhanced_monitoring_interval
   monitoring_role_arn                   = local.monitoring_role_arn
   timeouts                              = var.timeouts

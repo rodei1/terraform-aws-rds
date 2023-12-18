@@ -113,7 +113,8 @@ locals {
   performance_insights_enabled          = var.performance_insights_enabled != null ? var.performance_insights_enabled : local.default_config.performance_insights_enabled
   performance_insights_retention_period = var.performance_insights_retention_period != null ? var.performance_insights_retention_period : local.default_config.performance_insights_retention_period
   delete_automated_backups              = var.delete_automated_backups != null ? var.delete_automated_backups : local.default_config.delete_automated_backups
-  backup_retention_period               = var.backup_retention_period != null ? var.backup_retention_period : 0
+  backup_retention_period               = null
+  backup_window                         = null
 
   ########################################################################
   # Tagging
