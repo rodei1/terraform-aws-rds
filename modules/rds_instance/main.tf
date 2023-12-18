@@ -291,6 +291,7 @@ resource "aws_iam_role" "access_from_aws" {
   name                = "${aws_db_instance.this.identifier}-for-aws-services"
   assume_role_policy  = data.aws_iam_policy_document.services.json
   managed_policy_arns = [aws_iam_policy.connect.arn, aws_iam_policy.secretsmanager.arn]
+  tags                = var.tags
 }
 
 resource "aws_iam_instance_profile" "ec2" {
