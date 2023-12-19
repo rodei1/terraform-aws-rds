@@ -840,8 +840,9 @@ variable "kubernetes_namespace" {
 variable "resource_owner_contact_email" {
   description = "Sets the dfds.owner tag"
   type        = string
+  default     = null
   validation {
-    condition     = var.resource_owner_contact_email != null && can(regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", var.resource_owner_contact_email))
+    condition     = var.resource_owner_contact_email == null || can(regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", var.resource_owner_contact_email))
     error_message = "Invalid value for var.resource_owner_contact_email. Must be a valid email address."
   }
 }

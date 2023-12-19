@@ -119,12 +119,14 @@ locals {
   ########################################################################
   # Tagging
   ########################################################################
+  resource_owner_contact_email = var.resource_owner_contact_email != null ? {
+    "dfds.owner" = var.resource_owner_contact_email
+  } : {}
   all_tags = merge({
-    "dfds.owner" : var.resource_owner_contact_email,
     "dfds.env" : var.environment,
     "dfds.cost.centre" : var.cost_centre,
     "dfds.service.availability" : var.service_availability,
-  }, var.optional_tags)
+  }, var.optional_tags, local.resource_owner_contact_email)
   data_backup_retention_tag = var.additional_backup_retention != "" ? { "dfds.data.backup.retention" : var.additional_backup_retention } : {}
   data_tags = merge({
     "dfds.data.backup" : var.enable_default_backup,
