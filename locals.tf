@@ -54,15 +54,14 @@ locals {
   # DB Proxy configuration
   ########################################################################
   proxy_name          = var.proxy_name == null ? "${var.identifier}" : var.proxy_name
-  db_proxy_secret_arn = local.is_serverless ? try(module.db_cluster_serverless[0].cluster_master_user_secret_arn, null) : coalesce(module.db_instance[0].db_instance_master_user_secret_arn, null)
-
-  proxy_auth_config = {
+  db_proxy_secret_arn = var.include_proxy ? (local.is_serverless ? try(module.db_cluster_serverless[0].cluster_master_user_secret_arn, null) : try(module.db_instance[0].db_instance_master_user_secret_arn, null)) : null
+  proxy_auth_config = var.include_proxy ? {
     (var.username) = {
       description = "Proxy user for ${var.username}"
       secret_arn  = local.db_proxy_secret_arn # aws_secretsmanager_secret.superuser.arn
       iam_auth    = var.rds_proxy_iam_auth
     }
-  }
+  } : {}
 
   ########################################################################
   # Instance configs
@@ -77,6 +76,7 @@ locals {
   config = {
     prod = {
       instance_class                        = "db.t3.micro",
+      allocated_storage                     = 20,
       max_allocated_storage                 = 50,
       port                                  = 5432,
       multi_az                              = true,
