@@ -105,6 +105,7 @@ module "db_instance" {
   copy_tags_to_snapshot                 = var.copy_tags_to_snapshot
   skip_final_snapshot                   = local.skip_final_snapshot
   final_snapshot_identifier_prefix      = var.final_snapshot_identifier_prefix
+  snapshot_identifier                   = var.snapshot_identifier
   performance_insights_enabled          = local.performance_insights_enabled
   performance_insights_retention_period = local.performance_insights_retention_period
   backup_retention_period               = local.backup_retention_period

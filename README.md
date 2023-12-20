@@ -136,7 +136,7 @@ Terraform module for AWS RDS instances
 | <a name="input_manage_master_user_password"></a> [manage\_master\_user\_password](#input\_manage\_master\_user\_password) | Set to true to allow RDS to manage the master user password in Secrets Manager | `bool` | `true` | no |
 | <a name="input_master_user_secret_kms_key_id"></a> [master\_user\_secret\_kms\_key\_id](#input\_master\_user\_secret\_kms\_key\_id) | The key ARN, key ID, alias ARN or alias name for the KMS key to encrypt the master user password secret in Secrets Manager.<br>  If not specified, the default KMS key for your Amazon Web Services account is used. | `string` | `null` | no |
 | <a name="input_max_allocated_storage"></a> [max\_allocated\_storage](#input\_max\_allocated\_storage) | Specifies the value for Storage Autoscaling | `number` | `0` | no |
-| <a name="input_multi_az"></a> [multi\_az](#input\_multi\_az) | Specifies if the RDS instance is multi-AZ | `bool` | `false` | no |
+| <a name="input_multi_az"></a> [multi\_az](#input\_multi\_az) | Specifies if the RDS instance is multi-AZ | `bool` | `null` | no |
 | <a name="input_nchar_character_set_name"></a> [nchar\_character\_set\_name](#input\_nchar\_character\_set\_name) | The national character set is used in the NCHAR, NVARCHAR2, and NCLOB data types for Oracle instances. This can't be changed. | `string` | `null` | no |
 | <a name="input_network_type"></a> [network\_type](#input\_network\_type) | The type of network stack to use | `string` | `null` | no |
 | <a name="input_oidc_provider"></a> [oidc\_provider](#input\_oidc\_provider) | The OIDC provider used for IAM Role for ServiceAccount authentication from Kubernetes | `string` | `null` | no |
@@ -155,7 +155,7 @@ Terraform module for AWS RDS instances
 | <a name="input_performance_insights_enabled"></a> [performance\_insights\_enabled](#input\_performance\_insights\_enabled) | Specifies whether Performance Insights are enabled | `bool` | `null` | no |
 | <a name="input_performance_insights_kms_key_id"></a> [performance\_insights\_kms\_key\_id](#input\_performance\_insights\_kms\_key\_id) | The ARN for the KMS key to encrypt Performance Insights data | `string` | `null` | no |
 | <a name="input_performance_insights_retention_period"></a> [performance\_insights\_retention\_period](#input\_performance\_insights\_retention\_period) | The amount of time in days to retain Performance Insights data. Valid values are `7`, `731` (2 years) or a multiple of `31` | `number` | `null` | no |
-| <a name="input_port"></a> [port](#input\_port) | The port on which the DB accepts connections | `string` | `"5432"` | no |
+| <a name="input_port"></a> [port](#input\_port) | The port on which the DB accepts connections. If not set it will be 5432 | `string` | `null` | no |
 | <a name="input_proxy_debug_logging"></a> [proxy\_debug\_logging](#input\_proxy\_debug\_logging) | Turn on debug logging for the proxy | `bool` | `false` | no |
 | <a name="input_proxy_engine_family"></a> [proxy\_engine\_family](#input\_proxy\_engine\_family) | Engine family of the RDS proxy. Default: POSTGRESQL | `string` | `"POSTGRESQL"` | no |
 | <a name="input_proxy_name"></a> [proxy\_name](#input\_proxy\_name) | Name of the RDS proxy. Will be auto-generated if not specified | `string` | `null` | no |

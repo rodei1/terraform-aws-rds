@@ -90,7 +90,7 @@ locals {
       allocated_storage                     = 20,
       max_allocated_storage                 = null
       port                                  = 5432,
-      multi_az                              = true,
+      multi_az                              = false,
       skip_final_snapshot                   = true,
       performance_insights_enabled          = false,
       performance_insights_retention_period = null,

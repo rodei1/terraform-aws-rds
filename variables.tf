@@ -167,10 +167,9 @@ variable "master_user_secret_kms_key_id" {
 }
 
 variable "port" {
-  description = "The port on which the DB accepts connections"
+  description = "The port on which the DB accepts connections. If not set it will be 5432"
   type        = string
-  # default     = null
-  default = "5432"
+  default     = null
 }
 
 variable "vpc_security_group_ids" {
@@ -188,7 +187,7 @@ variable "availability_zone" {
 variable "multi_az" {
   description = "Specifies if the RDS instance is multi-AZ"
   type        = bool
-  default     = false
+  default     = null
 }
 
 variable "iops" {
