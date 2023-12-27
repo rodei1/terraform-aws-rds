@@ -116,8 +116,8 @@ module "db_instance" {
   deletion_protection                   = var.deletion_protection
   delete_automated_backups              = local.delete_automated_backups
   enabled_cloudwatch_logs_exports       = var.enabled_cloudwatch_logs_exports
-  oidc_provider                         = var.oidc_provider
-  kubernetes_namespace                  = var.kubernetes_namespace
+  oidc_provider                         = local.oidc_provider
+  kubernetes_namespace                  = local.kubernetes_namespace
   tags                                  = local.all_tags
   rds_tags                              = local.data_tags
 }

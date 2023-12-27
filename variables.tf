@@ -819,18 +819,12 @@ variable "rds_security_group_rules" {
 # # IAM Roles for ServiceAccounts (IRSA) - only applicable from Kubernetes pods
 # ################################################################################
 
-variable "oidc_provider" {
-  description = "The OIDC provider used for IAM Role for ServiceAccount authentication from Kubernetes"
-  type        = string
-  default     = null
-}
 
-variable "kubernetes_namespace" {
-  description = "The namespace used for IAM Role for ServiceAccount authentication from Kubernetes"
-  type        = string
-  default     = null
+variable "is_kubernetes_app_enabled" {
+  description = "Determines whether to create needed resources to enable access from Kubernetes"
+  type        = bool
+  default     = false
 }
-
 
 ################################################################################
 # Resource tagging

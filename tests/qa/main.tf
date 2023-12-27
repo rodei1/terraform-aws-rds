@@ -39,8 +39,6 @@ module "rds_instance_test" {
   allow_major_version_upgrade            = true
   engine_version                         = "16.1"
   performance_insights_enabled           = true
-  oidc_provider                          = "oidc.eks.eu-west-1.amazonaws.com/id/B182759F93D251942CB146063F57036B"
-  kubernetes_namespace                   = "cloudengineering-bluep-nvfgm"
   vpc_id                                 = "vpc-04a384af7d3657687"
   deletion_protection                    = false
   service_availability                   = "low"
@@ -87,5 +85,5 @@ module "rds_instance_test" {
       },
     ]
   }
-
+  is_kubernetes_app_enabled = true
 }

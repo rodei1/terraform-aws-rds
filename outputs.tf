@@ -16,7 +16,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
     name: ${module.db_instance[0].db_instance_identifier}
-    namespace: ${var.kubernetes_namespace}
+    namespace: ${local.kubernetes_namespace}
     annotations:
         eks.amazonaws.com/role-arn: "${module.db_instance[0].iam_role_for_kubernetes_serviceaccounts.arn}"
         eks.amazonaws.com/sts-regional-endpoints: "true"

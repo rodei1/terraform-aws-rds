@@ -132,4 +132,10 @@ locals {
     "dfds.data.backup" : var.enable_default_backup,
     "dfds.data.classification" : var.data_classification,
   }, var.optional_data_specific_tags, local.data_backup_retention_tag)
+
+  ########################################################################
+  # Kubernetes
+  ########################################################################
+  kubernetes_namespace = var.is_kubernetes_app_enabled ? trimprefix(data.aws_iam_account_alias.current.account_alias, "dfds-") : null
+  oidc_provider        = var.is_kubernetes_app_enabled ? trimprefix(data.aws_ssm_parameter.oidc_provider.value, "https://") : null
 }
