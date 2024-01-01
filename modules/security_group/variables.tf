@@ -244,13 +244,13 @@ variable "egress_with_prefix_list_ids" {
 variable "egress_cidr_blocks" {
   description = "List of IPv4 CIDR ranges to use on all egress rules"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = []
 }
 
 variable "egress_ipv6_cidr_blocks" {
   description = "List of IPv6 CIDR ranges to use on all egress rules"
   type        = list(string)
-  default     = ["::/0"]
+  default     = []
 }
 
 variable "egress_prefix_list_ids" {

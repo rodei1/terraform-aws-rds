@@ -18,21 +18,20 @@ locals {
 }
 
 module "rds_instance_test" {
-  source     = "../../"
+  source             = "../../"
   create_db_instance = true
-  identifier = local.name
+  identifier         = local.name
 
 
-  username                               = "instance_user"
+  username = "instance_user"
 
   apply_immediately                      = true
   publicly_accessible                    = true
-
   subnet_ids                             = concat(module.vpc.public_subnets)
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1
-  include_proxy                          = false
-  proxy_debug_logging                    = true
+  is_proxy_included                      = false
+  proxy_debug_logging_is_enabled         = true
 
   # Group variables into maps
   vpc_id = module.vpc.vpc_id
@@ -61,6 +60,7 @@ module "rds_instance_test" {
   data_classification          = "public"
   enable_default_backup        = true
   optional_tags                = local.tags
+  is_kubernetes_app_enabled    = true
 }
 
 ################################################################################

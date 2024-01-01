@@ -17,13 +17,13 @@ locals {
 
 }
 
-module "rds_instance_test" {
+module "rds_instance_test" { # TODO: change to only use defaults and required variables
   source                                 = "../../"
   identifier                             = local.name
   environment                            = "test"
   instance_class                         = "db.t3.micro"
   db_name                                = "qadb"
-  multi_az                               = true
+  instance_is_multi_az                   = true
   username                               = "qa_user"
   manage_master_user_password            = true
   iam_database_authentication_enabled    = true
@@ -33,8 +33,8 @@ module "rds_instance_test" {
   subnet_ids                             = ["subnet-04d5d42ac21fd8e8f", "subnet-0e50a82dec5fc0272", "subnet-0a49d384ff2e8a580"]
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1
-  include_proxy                          = true
-  proxy_debug_logging                    = true
+  is_proxy_included                      = true
+  proxy_debug_logging_is_enabled         = true
   enhanced_monitoring_interval           = 0
   allow_major_version_upgrade            = true
   engine_version                         = "16.1"
