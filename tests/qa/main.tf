@@ -29,7 +29,7 @@ module "rds_instance_test" { # TODO: change to only use defaults and required va
   iam_database_authentication_enabled    = true
   ca_cert_identifier                     = "rds-ca-ecc384-g1"
   apply_immediately                      = true
-  publicly_accessible                    = true
+  is_publicly_accessible                 = true
   subnet_ids                             = ["subnet-04d5d42ac21fd8e8f", "subnet-0e50a82dec5fc0272", "subnet-0a49d384ff2e8a580"]
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1

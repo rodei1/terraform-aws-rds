@@ -26,7 +26,7 @@ module "rds_instance_test" {
   username = "instance_user"
 
   apply_immediately                      = true
-  publicly_accessible                    = true
+  is_publicly_accessible                 = true
   subnet_ids                             = concat(module.vpc.public_subnets)
   enabled_cloudwatch_logs_exports        = ["upgrade", "postgresql"]
   cloudwatch_log_group_retention_in_days = 1

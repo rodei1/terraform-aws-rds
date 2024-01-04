@@ -72,7 +72,7 @@ locals {
   ########################################################################
 
   iops                      = var.iops == null && var.storage_type == "io1" ? 1000 : var.iops # The minimum value is 1,000 IOPS and the maximum value is 256,000 IOPS. The IOPS to GiB ratio must be between 0.5 and 50
-  is_serverless             = var.is_serverless                                               # temporary controlled by variable. TODO: Replace by calculation
+  is_serverless             = false                                                           # temporary controlled by variable. TODO: Replace by calculation
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.final_snapshot_identifier_prefix}-${var.identifier}-${try(random_id.snapshot_identifier[0].hex, "")}"
 
   engine = "postgres"

@@ -1,0 +1,1 @@
+pg_restore -v -U $POSTGRES_USER -d $POSTGRES_DB -j 2 dump.sql

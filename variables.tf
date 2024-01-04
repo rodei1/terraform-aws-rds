@@ -4,10 +4,6 @@
 # Instance specific variables - applicable to cluster instances as well
 ################################################################################
 
-variable "is_instance" { # TODO: Remove this variable if not used
-  default = true
-}
-
 variable "environment" {
   description = <<EOF
     Specify the staging environment.
@@ -25,7 +21,7 @@ variable "identifier" {
   description = <<EOF
     Specify the name of the RDS instance to create.
     Valid Values: .
-    Notes: .
+    Notes: This
 EOF
   type        = string
 }
@@ -280,7 +276,7 @@ EOF
   default     = null
 }
 
-variable "publicly_accessible" {
+variable "is_publicly_accessible" {
   description = <<EOF
     Specify whether or not this instance is publicly accessible.
     Valid Values: .
@@ -537,8 +533,19 @@ EOF
 ################################################################################
 
 variable "is_cluster" {
-  type    = bool
-  default = false
+  description = <<EOF
+    [Experiemental Feature] Specify whether or not to deploy the instance as multi-az database cluster.
+    Valid Values: .
+    Notes:
+    - This feature is currently in beta and is subject to change.
+    - It creates a DB cluster with a primary DB instance and two readable standby DB instances,
+    - Each DB instance in a different Availability Zone (AZ).
+    - Provides high availability, data redundancy and increases capacity to serve read workloads
+    - Proxy is not supported for cluster instances.
+    - For smaller workloads we recommend considering using a single instance instead of a cluster.
+EOF
+  type        = bool
+  default     = false
 }
 
 variable "cluster_use_name_prefix" {
@@ -728,11 +735,6 @@ EOF
     condition     = contains(["DISABLED", "REQUIRED"], var.proxy_iam_auth)
     error_message = "Invalid value for var.proxy_iam_auth. Supported values: DISABLED, REQUIRED."
   }
-}
-
-variable "is_serverless" { # temporary variable for testing
-  type    = bool
-  default = false
 }
 
 

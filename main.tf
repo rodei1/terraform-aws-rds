@@ -95,7 +95,7 @@ module "db_instance" {
   multi_az                              = local.instance_is_multi_az
   iops                                  = var.iops
   storage_throughput                    = var.storage_throughput
-  publicly_accessible                   = var.publicly_accessible
+  publicly_accessible                   = var.is_publicly_accessible
   ca_cert_identifier                    = var.ca_cert_identifier
   allow_major_version_upgrade           = var.allow_major_version_upgrade
   auto_minor_version_upgrade            = var.auto_minor_version_upgrade

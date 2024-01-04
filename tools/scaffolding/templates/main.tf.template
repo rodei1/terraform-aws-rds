@@ -1,0 +1,22 @@
+terraform {
+  backend "s3" {
+    bucket         = "<your_bucket_name>-state-bucket"
+    encrypt        = true
+    key            = "<your-folder-name>/terraform.tfstate" # This is the path to the state file inside the bucket. You can change it to whatever you want.
+    region         = "eu-central-1"
+    dynamodb_table = "terraform-locks"
+  }
+}
+
+
+provider "aws" {
+  region = "eu-central-1"
+}
+
+
+module "db_instance" {
+  source = "git::https://github.com/dfds/aws-modules-rds.git?ref=<release_number>"
+$inputs
+}
+
+$outputs
