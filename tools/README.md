@@ -1,6 +1,6 @@
 Run docker file:
 
-cd /dfds/aws-modules-rds/tools
+cd /dfds/terraform-aws-rds/tools
 
 ```bash
 docker build -t scaffold .
@@ -9,5 +9,5 @@ docker build -t scaffold .
 mkdir auto-generated
 
 ```bash
-docker run -v <absolute-path>/aws-modules-rds/:/input -v <absolute-path>/aws-modules-rds/tools/auto-generated:/output scaffold:latest
+docker run -v <absolute-path>/terraform-aws-rds/:/input -v <absolute-path>/terraform-aws-rds/tools/auto-generated:/output scaffold:latest
 ```

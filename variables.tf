@@ -813,13 +813,13 @@ EOF
 variable "pipeline_location" { # TODO: Consider making it required. Consider how to support run from local machine. Re-Test validation.
   description = <<EOF
     Specify a valid URL path to the file used for automation script.
-    Valid Values: URL to repo. Example: `"https://github.com/dfds/aws-modules-rds/actions/workflows/qa.yml"`
+    Valid Values: URL to repo. Example: `"https://github.com/dfds/terraform-aws-rds/actions/workflows/qa.yml"`
     Notes: This set the dfds.automation.initiator.pipeline tag. See recommendations [here](https://wiki.dfds.cloud/en/playbooks/standards/tagging_policy).
 EOF
   type        = string
   default     = null
   validation {
     condition     = var.pipeline_location == null || can(regex("^(https:\\/\\/www\\.|http:\\/\\/www\\.|https:\\/\\/|http:\\/\\/)?[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})([a-z0-9_@\\-^!#$%&+={}.\\/\\\\[\\]]+)+\\.(yml|yaml|sh)$", var.pipeline_location))
-    error_message = "Invalid value for var.pipeline_location. Supported values: URL path. Example: https://github.com/dfds/aws-modules-rds/actions/workflows/qa.yml"
+    error_message = "Invalid value for var.pipeline_location. Supported values: URL path. Example: https://github.com/dfds/terraform-aws-rds/actions/workflows/qa.yml"
   }
 }
