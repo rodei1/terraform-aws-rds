@@ -8,10 +8,10 @@ locals {
 
   tags = {
     Name                                 = local.name
-    Repository                           = "https://github.com/dfds/aws-modules-rds"
+    Repository                           = "https://github.com/dfds/terraform-aws-rds"
     "dfds.automation.tool"               = "Terraform"
-    "dfds.automation.initiator.location" = "https://github.com/dfds/aws-modules-rds/"
-    "dfds.automation.initiator.pipeline" = "https://github.com/dfds/aws-modules-rds/actions/workflows/qa.yml"
+    "dfds.automation.initiator.location" = "https://github.com/dfds/terraform-aws-rds/"
+    "dfds.automation.initiator.pipeline" = "https://github.com/dfds/terraform-aws-rds/actions/workflows/qa.yml"
     "dfds.test.scope"                    = "qa"
   }
 
