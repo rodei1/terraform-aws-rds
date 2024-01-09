@@ -9,3 +9,11 @@ data "aws_iam_account_alias" "current" {}
 data "aws_ssm_parameter" "oidc_provider" {
   name = "/managed/cluster/oidc-provider"
 }
+
+data "aws_vpc" "selected" {
+  id = var.vpc_id
+}
+
+data "aws_vpc_peering_connection" "kubernetes_access" {
+  tags = { Name = "oxygen-hellman" }
+}

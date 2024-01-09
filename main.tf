@@ -12,7 +12,7 @@ resource "random_id" "snapshot_identifier" {
   byte_length = 4
 }
 
-resource "null_resource" "validate_instance_type_proxy" { # TODO: need to enforce dependency in proxy module
+resource "null_resource" "validate_instance_type_proxy" {
   count = var.is_cluster && var.is_proxy_included ? 1 : 0
 
   provisioner "local-exec" {
@@ -217,30 +217,42 @@ module "db_proxy" {
 
 }
 
-module "security_group" { # TODO: update with another rule for public access
-  source                   = "./modules/security_group"
-  name                     = var.identifier
-  description              = "RDS PostgreSQL security group"
-  vpc_id                   = var.vpc_id
-  ingress_with_cidr_blocks = var.rds_security_group_rules.ingress_rules
-  ingress_with_self        = var.rds_security_group_rules.ingress_with_self
-  egress_with_cidr_blocks  = var.rds_security_group_rules.egress_rules
-  tags                     = local.all_tags
+module "security_group" {
+  source      = "./modules/security_group"
+  name        = var.identifier
+  description = "RDS PostgreSQL security group"
+  vpc_id      = var.vpc_id
+  ingress_with_cidr_blocks = concat(
+    [{
+      from_port   = local.port
+      to_port     = local.port
+      protocol    = "tcp"
+      description = "PostgreSQL access from within VPC"
+      cidr_blocks = data.aws_vpc.selected.cidr_block
+      }, local.peering_ingress_rule
+    ], local.public_access_sg_rules,
+    var.additional_rds_security_group_rules.ingress_rules
+  )
+  ingress_with_self       = var.additional_rds_security_group_rules.ingress_with_self
+  egress_with_cidr_blocks = var.additional_rds_security_group_rules.egress_rules
+  tags                    = local.all_tags
 }
 
 module "security_group_proxy" {
-  source                   = "./modules/security_group"
-  count                    = var.is_proxy_included ? 1 : 0
-  name                     = "${var.identifier}-proxy"
-  description              = "RDS PostgreSQL security group for proxy"
-  vpc_id                   = var.vpc_id
-  ingress_with_cidr_blocks = var.proxy_security_group_rules.ingress_rules
+  source      = "./modules/security_group"
+  count       = var.is_proxy_included ? 1 : 0
+  name        = "${var.identifier}-proxy"
+  description = "RDS PostgreSQL security group for proxy"
+  vpc_id      = var.vpc_id
+  ingress_with_cidr_blocks = concat([
+    local.peering_ingress_rule,
+  ], var.proxy_additional_security_group_rules.ingress_rules)
   ingress_with_self = concat([{
     from_port = local.port
     to_port   = local.port
     protocol  = "tcp"
     description = "PostgreSQL access from within Security Gruop" }],
-  var.proxy_security_group_rules.ingress_with_self)
+  var.proxy_additional_security_group_rules.ingress_with_self)
   egress_with_source_security_group_id = [{
     source_security_group_id = module.security_group.security_group_id
     from_port                = local.port

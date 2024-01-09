@@ -618,11 +618,12 @@ EOF
   }
 }
 
-variable "proxy_security_group_rules" {
+variable "proxy_additional_security_group_rules" {
   description = <<EOF
     Specify additional security group rules for the RDS proxy.
     Valid Values: .
     Notes:
+    - Public access is not supported on RDS Proxy. See [documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html#rds-proxy.limitations) for more information.
     - Only ingress(inbound) rules are supported.
     - Ingress rules are set to "Allow outbound traffic to PostgreSQL instance"
     – Ingress rules are set to "Allow inbound traffic from same security group on specified database port"
@@ -664,17 +665,28 @@ EOF
   type        = string
 }
 
-variable "rds_security_group_rules" {
+variable "additional_rds_security_group_rules" {
   description = <<EOF
     Specify additional security group rules for the RDS instance.
     Valid Values: .
-    Notes: .
+    Notes: Use only for special cases.
 EOF
   type = object({
     ingress_rules     = list(any)
     ingress_with_self = optional(list(any), [])
     egress_rules      = optional(list(any), [])
   })
+  default = {
+    ingress_rules     = []
+    ingress_with_self = []
+    egress_rules      = []
+  }
+}
+
+variable "public_access_ip_whitelist" {
+  description = "Provide a list of IP addresses to whitelist for public access"
+  type        = list(string)
+  default     = []
 }
 
 # ################################################################################

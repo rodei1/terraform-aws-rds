@@ -48,42 +48,6 @@ module "rds_instance_test" { # TODO: change to only use defaults and required va
   enable_default_backup                  = false
   optional_tags                          = local.tags
 
-  proxy_security_group_rules = {
-    ingress_rules = [
-      {
-        from_port   = 5432
-        to_port     = 5432
-        protocol    = "tcp"
-        description = "PostgreSQL access over VPC peering"
-        cidr_blocks = "10.0.0.0/16"
-      },
-    ]
-  }
-
-  rds_security_group_rules = {
-    ingress_rules = [
-      {
-        from_port   = 5432
-        to_port     = 5432
-        protocol    = "tcp"
-        description = "PostgreSQL access from within VPC"
-        cidr_blocks = "10.100.56.0/22"
-      },
-      {
-        from_port   = 5432
-        to_port     = 5432
-        protocol    = "tcp"
-        description = "PostgreSQL access over VPC peering"
-        cidr_blocks = "10.0.0.0/16"
-      },
-      {
-        from_port   = 5432
-        to_port     = 5432
-        protocol    = "tcp"
-        description = "PostgreSQL access from public IPs"
-        cidr_blocks = "0.0.0.0/0"
-      },
-    ]
-  }
-  is_kubernetes_app_enabled = true
+  public_access_ip_whitelist = ["0.0.0.0/0"]
+  is_kubernetes_app_enabled  = true
 }

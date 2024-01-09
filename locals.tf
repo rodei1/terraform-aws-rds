@@ -57,12 +57,11 @@ locals {
   ########################################################################
   # DB Proxy configuration
   ########################################################################
-  # proxy_name          = var.proxy_name == null ? "${var.identifier}" : var.proxy_name
   db_proxy_secret_arn = var.is_proxy_included ? (local.is_serverless ? try(module.db_cluster_serverless[0].cluster_master_user_secret_arn, null) : try(module.db_instance[0].db_instance_master_user_secret_arn, null)) : null
   proxy_auth_config = var.is_proxy_included ? {
     (var.username) = {
       description = "Proxy user for ${var.username}"
-      secret_arn  = local.db_proxy_secret_arn # aws_secretsmanager_secret.superuser.arn
+      secret_arn  = local.db_proxy_secret_arn
       iam_auth    = var.proxy_iam_auth
     }
   } : {}
@@ -70,7 +69,6 @@ locals {
   ########################################################################
   # Instance configs
   ########################################################################
-
   iops                      = var.iops == null && var.storage_type == "io1" ? 1000 : var.iops # The minimum value is 1,000 IOPS and the maximum value is 256,000 IOPS. The IOPS to GiB ratio must be between 0.5 and 50
   is_serverless             = false                                                           # temporary controlled by variable. TODO: Replace by calculation
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.final_snapshot_identifier_prefix}-${var.identifier}-${try(random_id.snapshot_identifier[0].hex, "")}"
@@ -146,4 +144,27 @@ locals {
   ########################################################################
   kubernetes_namespace = var.is_kubernetes_app_enabled ? trimprefix(data.aws_iam_account_alias.current.account_alias, "dfds-") : null
   oidc_provider        = var.is_kubernetes_app_enabled ? trimprefix(data.aws_ssm_parameter.oidc_provider.value, "https://") : null
+
+
+  ########################################################################
+  # Security group rules
+  ########################################################################
+  public_access_sg_rules = var.is_publicly_accessible ? [
+    for ip in var.public_access_ip_whitelist : {
+      from_port   = local.default_config.port
+      to_port     = local.default_config.port
+      protocol    = "tcp"
+      description = "PostgreSQL public access from IP ${ip}"
+      cidr_blocks = ip
+    } if ip != null
+  ] : []
+
+  peering_ingress_rule = var.is_kubernetes_app_enabled ? {
+    from_port   = local.default_config.port
+    to_port     = local.default_config.port
+    protocol    = "tcp"
+    description = "PostgreSQL access over VPC peering"
+    cidr_blocks = data.aws_vpc_peering_connection.kubernetes_access.peer_cidr_block_set[0].cidr_block
+  } : {}
+
 }
