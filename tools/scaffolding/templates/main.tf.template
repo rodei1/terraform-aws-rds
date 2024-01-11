@@ -15,7 +15,7 @@ provider "aws" {
 
 
 module "db_instance" {
-  source = "git::https://github.com/dfds/aws-modules-rds.git?ref=<release_number>"
+  source = "git::https://github.com/dfds/terraform-aws-rds.git?ref=<release_number>"
 $inputs
 }
 
