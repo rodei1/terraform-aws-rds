@@ -14,6 +14,14 @@ data "aws_vpc" "selected" {
   id = var.vpc_id
 }
 
-data "aws_vpc_peering_connection" "kubernetes_access" {
+data "aws_vpc_peering_connections" "peering" {
   tags = { Name = "oxygen-hellman" }
+}
+data "aws_vpc_peering_connection" "kubernetes_access" {
+  count = length(data.aws_vpc_peering_connections.peering.ids) > 0 ? 1 : 0
+  tags  = { Name = "oxygen-hellman" }
+}
+
+output "peering" {
+  value = data.aws_vpc_peering_connections.peering.ids
 }

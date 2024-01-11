@@ -21,7 +21,7 @@ variable "identifier" {
   description = <<EOF
     Specify the name of the RDS instance to create.
     Valid Values: .
-    Notes: This
+    Notes: .
 EOF
   type        = string
 }
@@ -373,13 +373,6 @@ EOF
   default     = []
 }
 
-variable "create_db_instance" { # TODO: Remove
-  description = "Whether to create a database instance"
-  type        = bool
-  default     = true
-}
-
-
 variable "instance_terraform_timeouts" {
   description = <<EOF
     Specify Terraform resource management timeouts.
@@ -700,6 +693,7 @@ variable "is_kubernetes_app_enabled" {
     Notes: Enabling this will create the following resources:
       - IAM role for service account (IRSA)
       - IAM policy for service account (IRSA)
+      - Peering connection from EKS Cluster requires a VPC peering deployed in the AWS account.
 EOF
   type        = bool
   default     = false

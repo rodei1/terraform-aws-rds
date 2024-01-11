@@ -71,7 +71,7 @@ module "enhanced_monitoring_iam_role" {
 
 module "db_instance" {
   source                                = "./modules/rds_instance"
-  count                                 = var.create_db_instance ? 1 : 0
+  count                                 = var.is_cluster ? 0 : 1
   identifier                            = var.identifier
   use_identifier_prefix                 = false
   engine                                = local.engine
@@ -142,7 +142,7 @@ module "db_multi_az_cluster" {
   allocated_storage               = local.allocated_storage
   iops                            = local.iops
   backup_retention_period         = null # Backup is managed by the organization
-  db_cluster_instance_class       = var.instance_class
+  db_cluster_instance_class       = local.instance_class
   master_username                 = var.username
   master_password                 = local.password
   manage_master_user_password     = var.manage_master_user_password
@@ -229,8 +229,10 @@ module "security_group" {
       protocol    = "tcp"
       description = "PostgreSQL access from within VPC"
       cidr_blocks = data.aws_vpc.selected.cidr_block
-      }, local.peering_ingress_rule
-    ], local.public_access_sg_rules,
+      }
+    ],
+    local.peering_ingress_rule,
+    local.public_access_sg_rules,
     var.additional_rds_security_group_rules.ingress_rules
   )
   ingress_with_self       = var.additional_rds_security_group_rules.ingress_with_self
@@ -244,9 +246,9 @@ module "security_group_proxy" {
   name        = "${var.identifier}-proxy"
   description = "RDS PostgreSQL security group for proxy"
   vpc_id      = var.vpc_id
-  ingress_with_cidr_blocks = concat([
+  ingress_with_cidr_blocks = concat(
     local.peering_ingress_rule,
-  ], var.proxy_additional_security_group_rules.ingress_rules)
+  var.proxy_additional_security_group_rules.ingress_rules)
   ingress_with_self = concat([{
     from_port = local.port
     to_port   = local.port
