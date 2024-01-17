@@ -130,7 +130,7 @@ locals {
     "dfds.env" : var.environment,
     "dfds.cost.centre" : var.cost_centre,
     "dfds.service.availability" : var.service_availability,
-    "dfds.automation.name" : "blueprints"
+    "dfds.automation.name" : "blueprints",
     "dfds.automation.tool" : "Terraform",
     "dfds.automation.initiator.location" : "https://github.com/dfds/terraform-aws-rds",
   }, var.optional_tags, local.resource_owner_contact_email, local.automation_initiator_pipeline_tag)
