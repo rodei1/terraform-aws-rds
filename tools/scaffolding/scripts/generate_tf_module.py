@@ -31,7 +31,7 @@ input_list = []
 output_list = []
 OUTPUT_TEMPLATE = """output "$out_name" {
   description = "$output_description"
-  value       = try(module.db_instance_example.$out_value, null)
+  value       = try(module.db_instance.$out_value, null)
 }"""
 
 with open(work_folder, "r", encoding='UTF-8') as f:
