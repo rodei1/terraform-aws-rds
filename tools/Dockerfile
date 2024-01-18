@@ -1,7 +1,7 @@
 FROM python:slim
 
 RUN apt update && \
-    apt install -y curl libpq-dev less jq tar unzip
+    apt install -y curl libpq-dev less jq tar unzip ssh
 
 
 # Adding  GitHub public SSH key to known hosts
