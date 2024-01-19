@@ -7,12 +7,9 @@ locals {
   region = "eu-central-1"
 
   tags = {
-    Name                                 = local.name
-    Repository                           = "https://github.com/dfds/terraform-aws-rds"
-    "dfds.automation.tool"               = "Terraform"
-    "dfds.automation.initiator.location" = "https://github.com/dfds/terraform-aws-rds/"
-    "dfds.automation.initiator.pipeline" = "https://github.com/dfds/terraform-aws-rds/actions/workflows/qa.yml"
-    "dfds.test.scope"                    = "qa"
+    Name = local.name
+
+    "dfds.test.scope" = "qa"
   }
 
 }
@@ -50,4 +47,7 @@ module "rds_instance_test" { # TODO: change to only use defaults and required va
 
   public_access_ip_whitelist = ["0.0.0.0/0"]
   is_kubernetes_app_enabled  = true
+
+  automation_initiator_location = "https://github.com/dfds/terraform-aws-rds/"
+  pipeline_location             = "https://github.com/dfds/terraform-aws-rds/actions/workflows/qa.yml"
 }

@@ -132,7 +132,7 @@ locals {
     "dfds.service.availability" : var.service_availability,
     "dfds.library.name" : "blueprints",
     "dfds.automation.tool" : "Terraform",
-    "dfds.automation.initiator.location" : "https://github.com/dfds/terraform-aws-rds",
+    "dfds.automation.initiator.location" : var.automation_initiator_location,
   }, var.optional_tags, local.resource_owner_contact_email, local.automation_initiator_pipeline_tag)
   data_backup_retention_tag = var.additional_backup_retention != null ? { "dfds.data.backup.retention" : var.additional_backup_retention } : {}
   data_tags = merge({

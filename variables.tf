@@ -804,16 +804,30 @@ EOF
   default     = {}
 }
 
-variable "pipeline_location" { # TODO: Consider making it required. Consider how to support run from local machine. Re-Test validation.
+variable "pipeline_location" {
   description = <<EOF
-    Specify a valid URL path to the file used for automation script.
+    Specify a valid URL path to the pipeline file used for automation script.
     Valid Values: URL to repo. Example: `"https://github.com/dfds/terraform-aws-rds/actions/workflows/qa.yml"`
     Notes: This set the dfds.automation.initiator.pipeline tag. See recommendations [here](https://wiki.dfds.cloud/en/playbooks/standards/tagging_policy).
 EOF
   type        = string
   default     = null
   validation {
-    condition     = var.pipeline_location == null || can(regex("^(https:\\/\\/www\\.|http:\\/\\/www\\.|https:\\/\\/|http:\\/\\/)?[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})([a-z0-9_@\\-^!#$%&+={}.\\/\\\\[\\]]+)+\\.(yml|yaml|sh)$", var.pipeline_location))
-    error_message = "Invalid value for var.pipeline_location. Supported values: URL path. Example: https://github.com/dfds/terraform-aws-rds/actions/workflows/qa.yml"
+    condition     = var.pipeline_location == null || can(regex("^(https:\\/\\/www\\.|http:\\/\\/www\\.|https:\\/\\/|http:\\/\\/)?[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})(\\.[a-zA-Z0-9]{2,})?(\\/[a-zA-Z0-9_.:/=+-@][^?|^/&]{2,})+$", var.pipeline_location))
+    error_message = "Value for var.pipeline_location contains invalid characters. See AWS [user guide](https://docs.aws.amazon.com/tag-editor/latest/userguide/tagging.html) for more information."
+  }
+}
+
+variable "automation_initiator_location" {
+  description = <<EOF
+    Specify the URL to the repo of automation script.
+    Valid Values: URL to repo. Example: `"https://github.com/dfds/terraform-aws-rds"`
+    Notes: This set the dfds.automation.initiator.location tag. See recommendations [here](https://wiki.dfds.cloud/en/playbooks/standards/tagging_policy).
+  EOF
+  type        = string
+  default     = null
+  validation {
+    condition     = var.automation_initiator_location == null || can(regex("^(https:\\/\\/www\\.|http:\\/\\/www\\.|https:\\/\\/|http:\\/\\/)?[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})(\\.[a-zA-Z0-9]{2,})?(\\/[a-zA-Z0-9_.:/=+-@][^?|^/&]{2,})+[\\/]?$", var.automation_initiator_location))
+    error_message = "Value for var.automation_initiator_location contains invalid characters or URL is malformed. See AWS [user guide](https://docs.aws.amazon.com/tag-editor/latest/userguide/tagging.html) for more information. Example: https://github.com/dfds/terraform-aws-rds"
   }
 }
