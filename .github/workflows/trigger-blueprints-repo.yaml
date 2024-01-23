@@ -13,6 +13,6 @@ jobs:
           curl -X POST https://api.github.com/repos/dfds/infrastructure-blueprints/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.AUTH_TOKEN }} \
-          --data '{"event_type": "trigger-workflow", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "release_tag": ${{ github.event.release.tag_name }} }}'
+          --data '{"event_type": "trigger-workflow", "client_payload": { "release_tag": ${{ github.event.release.tag_name }} }}'
       - uses: actions/checkout@v4
 
