@@ -352,7 +352,7 @@ variable "subnet_ids" {
   description = <<EOF
     Provide a list of VPC subnet IDs.
     Valid Values: .
-    Notes: IDs of the subnets must be in the same VPC as the RDS instance.
+    Notes: IDs of the subnets must be in the same VPC as the RDS instance. Example: ["subnet-aaaaaaaaaaa", "subnet-bbbbbbbbbbb", "subnet-cccccccccc"]
 EOF
   type        = list(string)
 }
