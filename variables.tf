@@ -40,7 +40,7 @@ variable "storage_type" {
   description = <<EOF
     Specify the storage type.
     Valid Values: One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), or 'io1' (provisioned IOPS SSD).
-    Notes: Default is 'io1' if iops is specified, 'gp2' if not. If you specify 'io1' or 'gp3' , you must also include a value for the 'iops' parameter
+    Notes: Default is 'io1' if iops is specified, 'gp2' if not. If you specify 'io1' or 'gp3' , you must also include a value for the 'iops' parameter.
 EOF
   type        = string
   default     = "gp3"
