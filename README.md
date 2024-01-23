@@ -8,7 +8,7 @@ Terraform module for AWS RDS instances
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0, < 2.0.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0, < 1.6.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.1 |
 
@@ -126,7 +126,6 @@ Terraform module for AWS RDS instances
 |------|-------------|
 | <a name="output_iam_instance_profile_for_ec2"></a> [iam\_instance\_profile\_for\_ec2](#output\_iam\_instance\_profile\_for\_ec2) | The name of the EC2 instance profile that is using the IAM Role that give AWS services access to the RDS instance and Secrets Manager |
 | <a name="output_iam_role_arn_for_aws_services"></a> [iam\_role\_arn\_for\_aws\_services](#output\_iam\_role\_arn\_for\_aws\_services) | The ARN of the IAM Role that give AWS services access to the RDS instance and Secrets Manager |
-| <a name="output_instance_engine_info"></a> [instance\_engine\_info](#output\_instance\_engine\_info) | The engine info for the selected engine of the RDS instance |
 | <a name="output_kubernetes_serviceaccount"></a> [kubernetes\_serviceaccount](#output\_kubernetes\_serviceaccount) | If you create this Kubernetes ServiceAccount, you will get access to the RDS through IRSA |
 | <a name="output_peering"></a> [peering](#output\_peering) | n/a |
 <!-- END_TF_DOCS -->
