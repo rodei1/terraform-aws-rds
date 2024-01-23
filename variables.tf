@@ -94,7 +94,7 @@ variable "skip_final_snapshot" { # TODO: Check if this has been tested (Backup w
     Setting this will determine whether a final DB snapshot is created before the DB instance is deleted.
     Valid Values: Specific version number, for example, "15.3" or major version number, for example, "15".
     Notes:
-    - If true is specified, no DB Snapshot is created. If false is specified, a DB snapshot is created before the DB instance is deleted
+    - If true is specified, no DB Snapshot is created. If false is specified, a DB snapshot is created before the DB instance is deleted.
     - Default value is set to true. Snapshots will be created by the AWS backup job assuming that this resource is properly tagged, see [here](https://wiki.dfds.cloud/en/playbooks/aws-backup/aws-backup-getting-started) for more info.
 EOF
   type        = bool
