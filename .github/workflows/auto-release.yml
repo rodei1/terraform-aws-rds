@@ -21,7 +21,15 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: rymndhng/release-on-push-action@master
+      - id: release
+        uses: rymndhng/release-on-push-action@master
         with:
           bump_version_scheme: patch
           tag_prefix: ""
+
+      - name: Dispatch to blueprints
+        run: |
+          curl -X POST https://api.github.com/repos/dfds/infrastructure-blueprints/dispatches \
+          -H 'Accept: application/vnd.github.everest-preview+json' \
+          -u ${{ secrets.AUTH_TOKEN }} \
+          --data '{"event_type": "trigger-workflow", "client_payload": { "release_tag": "${{ github.release.outputs.tag_name }}" }}'

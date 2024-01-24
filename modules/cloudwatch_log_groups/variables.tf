@@ -34,7 +34,7 @@ variable "cw_log_group_skip_destroy_on_deletion" {
 }
 
 variable "tags" {
-  description = "A mapping of tags to assign to all resources"
+  description = "A mapping of tags to assign to all resources."
   type        = map(string)
   default     = {}
 }
