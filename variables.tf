@@ -191,7 +191,7 @@ variable "db_name" {
   description = <<EOF
     Specifies The DB name to create.
     Valid Values: .
-    Notes: If omitted, no database is created initially
+    Notes: If omitted, no database is created initially.
 EOF
   type        = string
   default     = null
