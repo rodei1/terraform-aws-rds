@@ -284,6 +284,8 @@ variable "is_publicly_accessible" {
     - Setting this to true will do the followings:
       - Assign a public IP address and the host name of the DB instance will resolve to the public IP address.
       - Access from within the VPC can be achived by using the private IP address of the assigned Network Interface.
+      - Create a security group rule to allow inbound traffic from the specified CIDR blocks.
+        - It is required to set `public_access_ip_whitelist` to allow access from specific IP addresses.
 EOF
   type        = bool
   default     = false
@@ -677,7 +679,16 @@ EOF
 }
 
 variable "public_access_ip_whitelist" {
-  description = "Provide a list of IP addresses to whitelist for public access"
+  description = <<EOF
+    Provide a list of IP addresses to whitelist for public access
+    Valid Values: List of CIDR blocks. For example ["x.x.x.x/32", "y.y.y.y/32"]
+    Notes:
+    - In case of publicly accessible RDS, this list will be used to whitelist the IP addresses.
+    - It is best practice to specify the IP addresses that require access to the RDS instance.
+    - Setting this value to ["0.0.0.0/0"] will mean that the RDS instance will be open to the world! Following are examples where it can be necessary:
+      - Access is done from workloads with randomly assigned public IP adresses.
+      - A VPC peering is not configured.
+  EOF
   type        = list(string)
   default     = []
 }
