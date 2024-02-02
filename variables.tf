@@ -221,7 +221,7 @@ EOF
 
 variable "manage_master_user_password" {
   description = <<EOF
-    Set to true to allow RDS to manage the master user password in Secrets Manager
+    Set to true to allow RDS to manage the master user password in Secrets Manager.
     Valid Values: .
     Notes:
     - Default value is set to true. It is recommended to use this feature.
