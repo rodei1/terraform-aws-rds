@@ -235,10 +235,10 @@ variable "port" { # TODO: Set default value to 5432 and test after removing defa
   description = <<EOF
     Specify the port number on which the DB accepts connections.
     Valid Values: .
-    Notes: If omitted, the port number will set to 5432.
+    Notes: Default value is set to 5432.
 EOF
-  type        = string
-  default     = null
+  type        = number
+  default     = 5432
 }
 
 variable "availability_zone" {
@@ -742,7 +742,9 @@ variable "enable_default_backup" {
   description = <<EOF
     Specify whether or not to enable default backup.
     Valid Values: .
-    Notes: This set the dfds.backup tag. See recommendations [here](https://wiki.dfds.cloud/en/playbooks/standards/tagging_policy).
+    Notes:
+    - This set the dfds.backup tag. See recommendations [here](https://wiki.dfds.cloud/en/playbooks/standards/tagging_policy).
+    - If omitted, the default value is set to true for production and false for non-production environments.
 EOF
   type        = bool
   default     = null
