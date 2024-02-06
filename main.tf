@@ -141,7 +141,7 @@ module "db_multi_az_cluster" {
   storage_type                    = var.storage_type
   allocated_storage               = local.allocated_storage
   iops                            = local.iops
-  backup_retention_period         = null # Backup is managed by the organization
+  backup_retention_period         = local.backup_retention_period
   db_cluster_instance_class       = local.instance_class
   master_username                 = var.username
   master_password                 = local.password

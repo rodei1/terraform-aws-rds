@@ -115,7 +115,7 @@ locals {
   performance_insights_enabled          = var.performance_insights_enabled != null ? var.performance_insights_enabled : local.default_config.performance_insights_enabled
   performance_insights_retention_period = var.performance_insights_retention_period != null ? var.performance_insights_retention_period : local.default_config.performance_insights_retention_period
   delete_automated_backups              = var.delete_automated_backups != null ? var.delete_automated_backups : local.default_config.delete_automated_backups
-  backup_retention_period               = null
+  backup_retention_period               = null # Backup is managed by the organization. Setting it to null will avoid potential conflicts with the backup retention period that is set by the organsation AWS backup when it is enabled.
   backup_window                         = null
   storage_encrypted                     = true
 
