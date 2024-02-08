@@ -52,8 +52,8 @@ module "cw_log_group" {
   source                                = "./modules/cloudwatch_log_groups"
   count                                 = local.create_cloudwatch_log_group ? 1 : 0
   db_identifier                         = var.identifier
-  enabled_cw_logs_exports               = var.enabled_cloudwatch_logs_exports
-  cw_log_group_retention_in_days        = var.cloudwatch_log_group_retention_in_days
+  enabled_cw_logs_exports               = local.enabled_cloudwatch_logs_exports
+  cw_log_group_retention_in_days        = local.cloudwatch_log_group_retention_in_days
   cw_log_group_kms_key_id               = var.cloudwatch_log_group_kms_key_id
   cw_log_group_skip_destroy_on_deletion = var.cloudwatch_log_group_skip_destroy_on_deletion
   tags                                  = local.all_tags
@@ -114,7 +114,7 @@ module "db_instance" {
   timeouts                              = var.instance_terraform_timeouts
   deletion_protection                   = var.deletion_protection
   delete_automated_backups              = local.delete_automated_backups
-  enabled_cloudwatch_logs_exports       = var.enabled_cloudwatch_logs_exports
+  enabled_cloudwatch_logs_exports       = local.enabled_cloudwatch_logs_exports
   oidc_provider                         = local.oidc_provider
   kubernetes_namespace                  = local.kubernetes_namespace
   tags                                  = local.all_tags
@@ -151,7 +151,7 @@ module "db_multi_az_cluster" {
   db_cluster_parameter_group_name = module.cluster_parameters[0].db_cluster_parameter_group_id
   vpc_security_group_ids          = [module.security_group.security_group_id]
   skip_final_snapshot             = var.skip_final_snapshot
-  enabled_cloudwatch_logs_exports = var.enabled_cloudwatch_logs_exports
+  enabled_cloudwatch_logs_exports = local.enabled_cloudwatch_logs_exports
   tags                            = local.all_tags # might also need to add rds_tags
 
 }
@@ -211,7 +211,7 @@ module "db_proxy" {
   endpoints                             = {}
   manage_log_group                      = true
   cw_log_group_skip_destroy_on_deletion = var.cloudwatch_log_group_skip_destroy_on_deletion
-  log_group_retention_in_days           = var.cloudwatch_log_group_retention_in_days
+  log_group_retention_in_days           = local.cloudwatch_log_group_retention_in_days
   log_group_kms_key_id                  = var.cloudwatch_log_group_kms_key_id
   log_group_tags                        = local.all_tags
 

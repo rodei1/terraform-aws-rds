@@ -49,10 +49,13 @@ locals {
   monitoring_role_arn                           = try(module.enhanced_monitoring_iam_role[0].enhanced_monitoring_iam_role_arn, null)
   enhanced_monitoring_role_use_name_prefix      = false
   enhanced_monitoring_role_permissions_boundary = null
+
   ########################################################################
   # CloudWatch log group config
   ########################################################################
-  create_cloudwatch_log_group = length(var.enabled_cloudwatch_logs_exports) > 0
+  enabled_cloudwatch_logs_exports        = length(var.enabled_cloudwatch_logs_exports) > 0 ? var.enabled_cloudwatch_logs_exports : local.default_config.enabled_cloudwatch_logs_exports
+  create_cloudwatch_log_group            = length(local.enabled_cloudwatch_logs_exports) > 0
+  cloudwatch_log_group_retention_in_days = var.cloudwatch_log_group_retention_in_days >= 0 ? var.cloudwatch_log_group_retention_in_days : local.default_config.cloudwatch_log_group_retention_in_days
 
   ########################################################################
   # DB Proxy configuration
@@ -77,26 +80,30 @@ locals {
 
   config = {
     prod = {
-      instance_class                        = "db.t3.micro",
-      allocated_storage                     = 20,
-      max_allocated_storage                 = 50,
-      instance_is_multi_az                  = true,
-      skip_final_snapshot                   = false,
-      performance_insights_enabled          = true,
-      performance_insights_retention_period = 7,
-      delete_automated_backups              = false
-      enable_default_backup                 = true
+      instance_class                         = "db.t3.micro",
+      allocated_storage                      = 20,
+      max_allocated_storage                  = 50,
+      instance_is_multi_az                   = true,
+      skip_final_snapshot                    = false,
+      performance_insights_enabled           = true,
+      performance_insights_retention_period  = 7,
+      delete_automated_backups               = false,
+      enable_default_backup                  = true,
+      enabled_cloudwatch_logs_exports        = ["postgresql", "upgrade"],
+      cloudwatch_log_group_retention_in_days = 7,
     },
     non-prod = {
-      instance_class                        = "db.t3.micro",
-      allocated_storage                     = 20,
-      max_allocated_storage                 = 0, # 0 means no limit
-      instance_is_multi_az                  = false,
-      skip_final_snapshot                   = true,
-      performance_insights_enabled          = false,
-      performance_insights_retention_period = null,
-      delete_automated_backups              = true
-      enable_default_backup                 = false
+      instance_class                         = "db.t3.micro",
+      allocated_storage                      = 20,
+      max_allocated_storage                  = 0, # 0 means no limit
+      instance_is_multi_az                   = false,
+      skip_final_snapshot                    = true,
+      performance_insights_enabled           = false,
+      performance_insights_retention_period  = null,
+      delete_automated_backups               = true,
+      enable_default_backup                  = false,
+      enabled_cloudwatch_logs_exports        = [],
+      cloudwatch_log_group_retention_in_days = 1,
     }
   }
 
