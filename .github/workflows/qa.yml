@@ -20,7 +20,7 @@ on:
   push:
     branches: [main]
     paths:
-      - test/qa/**
+      - tests/qa/**
 
 concurrency: terraform_qa
 
