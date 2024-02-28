@@ -8,6 +8,7 @@ locals {
 
   tags = {
     Name = local.name
+
     "dfds.test.scope" = "qa"
   }
 
