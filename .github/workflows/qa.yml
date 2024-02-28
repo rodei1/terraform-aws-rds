@@ -17,6 +17,11 @@ on:
 
   workflow_dispatch:
 
+  push:
+    branches: [main]
+    paths:
+      - test/qa/**
+
 concurrency: terraform_qa
 
 defaults:

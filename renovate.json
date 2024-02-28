@@ -36,6 +36,17 @@
       ],
       "stabilityDays": 14,
       "automerge": false
+    },
+    {
+      "description": "Group dependencies affecting the QA environment.",
+      "additionalBranchPrefix": "qa/",
+      "matchPaths": [
+        "tests/qa/**"
+      ],
+      "addLabels": [
+        "norelease"
+      ],
+      "automerge": true
     }
   ]
 }
