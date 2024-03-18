@@ -87,7 +87,7 @@ module "db_instance" {
   port                                  = local.port
   iam_database_authentication_enabled   = var.iam_database_authentication_enabled
   manage_master_user_password           = var.manage_master_user_password
-  vpc_security_group_ids                = [module.security_group.security_group_id]
+  vpc_security_group_ids                = concat([module.security_group.security_group_id], var.additional_rds_security_groups)
   db_subnet_group_name                  = local.db_subnet_group_name
   parameter_group_name                  = module.db_parameter_group[0].db_parameter_group_id
   network_type                          = var.network_type
@@ -149,7 +149,7 @@ module "db_multi_az_cluster" {
   apply_immediately               = var.apply_immediately
   storage_encrypted               = local.storage_encrypted
   db_cluster_parameter_group_name = module.cluster_parameters[0].db_cluster_parameter_group_id
-  vpc_security_group_ids          = [module.security_group.security_group_id]
+  vpc_security_group_ids          = concat([module.security_group.security_group_id], var.additional_rds_security_groups)
   skip_final_snapshot             = var.skip_final_snapshot
   enabled_cloudwatch_logs_exports = local.enabled_cloudwatch_logs_exports
   tags                            = local.all_tags # might also need to add rds_tags
@@ -168,7 +168,7 @@ module "db_cluster_serverless" { # TODO: Revisit defaults and rename to aurora s
   master_username             = var.username
   manage_master_user_password = var.manage_master_user_password
   db_subnet_group_name        = local.db_subnet_group_name
-  vpc_security_group_ids      = [module.security_group.security_group_id]
+  vpc_security_group_ids      = concat([module.security_group.security_group_id], var.additional_rds_security_groups)
   monitoring_interval         = var.enhanced_monitoring_interval
   monitoring_role_arn         = local.monitoring_role_arn
   apply_immediately           = var.apply_immediately
@@ -196,7 +196,7 @@ module "db_proxy" {
   idle_client_timeout                   = var.proxy_idle_client_timeout
   require_tls                           = var.proxy_require_tls
   role_arn                              = try(module.db_instance[0].iam_role_for_aws_services.arn, module.db_cluster_serverless[0].iam_role_for_aws_services.arn, null) # TODO: Fix iam_role_for_aws_services for db_cluster_serverless by adding required IAM resources
-  vpc_security_group_ids                = [module.security_group_proxy[0].security_group_id]
+  vpc_security_group_ids                = concat([module.security_group_proxy[0].security_group_id], var.additional_rds_proxy_security_groups)
   vpc_subnet_ids                        = var.subnet_ids
   proxy_tags                            = local.all_tags
   connection_borrow_timeout             = null

@@ -616,6 +616,15 @@ EOF
   }
 }
 
+variable "additional_rds_proxy_security_groups" {
+  description = <<EOF
+    Specify additional security groups to attach by ID to the RDS proxy.
+    Valid Values: .
+    Notes: .}
+EOF
+default = []
+}
+
 variable "proxy_additional_security_group_rules" {
   description = <<EOF
     Specify additional security group rules for the RDS proxy.
@@ -661,6 +670,15 @@ variable "vpc_id" {
     Notes: .
 EOF
   type        = string
+}
+
+variable "additional_rds_security_groups" {
+  description = <<EOF
+    Specify additional security groups to attach by ID to the RDS instance.
+    Valid Values: .
+    Notes: .}
+EOF
+default = []
 }
 
 variable "additional_rds_security_group_rules" {
