@@ -617,6 +617,7 @@ EOF
 }
 
 variable "additional_rds_proxy_security_groups" {
+  type = list(string)
   description = <<EOF
     Specify additional security groups to attach by ID to the RDS proxy.
     Valid Values: .
@@ -673,6 +674,7 @@ EOF
 }
 
 variable "additional_rds_security_groups" {
+  type = list(string)
   description = <<EOF
     Specify additional security groups to attach by ID to the RDS instance.
     Valid Values: .
