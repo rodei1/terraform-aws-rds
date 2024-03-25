@@ -32,4 +32,4 @@ jobs:
           curl -X POST https://api.github.com/repos/dfds/infrastructure-blueprints/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.AUTH_TOKEN }} \
-          --data '{"event_type": "trigger-workflow", "client_payload": { "release_tag": "${{ steps.release.outputs.tag_name }}" }}'
+          --data '{"event_type": "trigger-rds-workflow", "client_payload": { "release_tag": "${{ steps.release.outputs.tag_name }}" }}'
