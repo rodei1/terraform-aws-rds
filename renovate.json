@@ -14,7 +14,7 @@
       "addLabels": [
         "release:patch"
       ],
-      "stabilityDays": 1,
+      "minimumReleaseAge": "1 day",
       "automerge": true
     },
     {
@@ -24,7 +24,7 @@
       "addLabels": [
         "release:minor"
       ],
-      "stabilityDays": 7,
+      "minimumReleaseAge": "7 days",
       "automerge": false
     },
     {
@@ -34,13 +34,13 @@
       "addLabels": [
         "release:major"
       ],
-      "stabilityDays": 14,
+      "minimumReleaseAge": "14 days",
       "automerge": false
     },
     {
       "description": "Group dependencies affecting the QA environment.",
       "additionalBranchPrefix": "qa/",
-      "matchPaths": [
+      "matchFileNames": [
         "tests/qa/**"
       ],
       "addLabels": [
