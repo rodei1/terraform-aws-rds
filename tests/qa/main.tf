@@ -40,7 +40,7 @@ module "rds_instance_test" { # TODO: change to only use defaults and required va
   deletion_protection                    = false
   service_availability                   = "low"
   resource_owner_contact_email           = "example@dfds.com"
-  cost_centre                            = "ti-arch"
+  cost_centre                            = "ti-platform"
   data_classification                    = "public"
   enable_default_backup                  = false
   optional_tags                          = local.tags
