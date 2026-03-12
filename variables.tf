@@ -154,7 +154,10 @@ variable "instance_class" {
       "db.t4g.micro",
       "db.t4g.small",
       "db.t4g.large",
-      "db.t4g.xlarge"
+      "db.t4g.xlarge",
+      "db.m5.large",
+      "db.m6g.large",
+      "db.m7g.2xlarge"
     Notes: If omitted, the instance type will be set to db.t3.micro.
 EOF
   type        = string
